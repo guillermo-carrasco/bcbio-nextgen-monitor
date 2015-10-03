@@ -1,0 +1,2 @@
+recursive-include bcbio_monitor/static *
+recursive-include bcbio_monitor/templates *
