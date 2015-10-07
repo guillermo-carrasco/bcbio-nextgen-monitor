@@ -1,3 +1,3 @@
 Monitor the status of bcbio-nextgen analysis
 
-![Screenshot]()
+![Screenshot](docs/images/monitor.png)
