@@ -1,4 +1,6 @@
+import argparse
 import os
+
 from flask import Flask, render_template, send_from_directory
 
 # App initialization
@@ -31,4 +33,10 @@ def index():
     return render_template('index.html')
 
 def main():
+    parser = argparse.ArgumentParser(description='Plot bcbio-nextgen analysis status on a small webb application')
+    parser.add_argument('logfile', type=str, help="Path to the file bcbio-nextgen-debug.log")
+    args = parser.parse_args()
+    if not os.path.exists(args.logfile):
+        raise RuntimeError('Provided log file {} does not exist or is not readable.'.format(args.logfile))
+    app.config.update(logfile=args.logfile)
     app.run()
