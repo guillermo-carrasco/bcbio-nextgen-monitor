@@ -4,7 +4,10 @@ Some methods have been re-used from the source code of bcbio-nextgen. The reason
 and copying the code instead is that as a monitor tool, I don't want to force the installaion of bcbio-nextgen
 on the user machine.
 """
+import pytz
+import re
 
+from datetime import datetime
 
 def get_bcbio_timings(path):
     """Fetch timing information from a bcbio log file."""
