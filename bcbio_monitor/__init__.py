@@ -2,6 +2,7 @@ import argparse
 import os
 
 from flask import Flask, render_template, send_from_directory
+from bcbio_monitor import parser
 
 # App initialization
 app = Flask(__name__, static_url_path='/static')
@@ -30,6 +31,8 @@ def page_not_found(e):
 
 @app.route("/")
 def index():
+    timings = parser.get_bcbio_timings(app.config.get('logfile'))
+    import ipdb; ipdb.set_trace()
     return render_template('index.html')
 
 def main():
