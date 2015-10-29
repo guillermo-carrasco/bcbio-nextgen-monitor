@@ -32,7 +32,6 @@ def page_not_found(e):
 @app.route("/")
 def index():
     timings = parser.get_bcbio_timings(app.config.get('logfile'))
-    import ipdb; ipdb.set_trace()
     return render_template('index.html')
 
 def main():

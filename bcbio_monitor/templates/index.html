@@ -6,7 +6,11 @@
   <h1>bcbio-nextgen analysis monitor</h1>
   <p>Status of the current analsys</p>
 </div>
-<div class="mermaid">
-    <!-- Graph content will go here -->
+<div id="progress_graph" class="mermaid">
+    graph TD;
+        A[Analysis started]-->B(Organize samples);
+        B-->C[Alignment preparation];
+
+        click A callback_null "Analysis started on Wed October 7th 17:30h"
 </div>
 {% endblock %}
