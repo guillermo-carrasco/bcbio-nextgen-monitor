@@ -7,12 +7,13 @@ on the user machine.
 import pytz
 import re
 
+from collections import OrderedDict
 from datetime import datetime
 
 def get_bcbio_timings(path):
     """Fetch timing information from a bcbio log file."""
     with open(path, 'r') as file_handle:
-        steps = {}
+        steps = OrderedDict()
         for line in file_handle:
             matches = re.search(r'^\[([^\]]+)\] ([^:]+: .*)', line)
             if not matches:

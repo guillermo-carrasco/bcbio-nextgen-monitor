@@ -1,8 +1,9 @@
 import argparse
 import os
 
-from flask import Flask, render_template, send_from_directory
-from bcbio_monitor import parser
+from flask import Flask, render_template, send_from_directory, jsonify
+from bcbio_monitor import graph
+from bcbio_monitor import parser as ps
 
 # App initialization
 app = Flask(__name__, static_url_path='/static')
@@ -31,7 +32,6 @@ def page_not_found(e):
 
 @app.route("/")
 def index():
-    timings = parser.get_bcbio_timings(app.config.get('logfile'))
     return render_template('index.html')
 
 def main():
@@ -41,4 +41,14 @@ def main():
     if not os.path.exists(args.logfile):
         raise RuntimeError('Provided log file {} does not exist or is not readable.'.format(args.logfile))
     app.config.update(logfile=args.logfile)
+    app.graph = graph.BcbioFlowChart(data=ps.get_bcbio_timings(args.logfile))
     app.run()
+
+
+###################
+#       API       #
+###################
+@app.route('/api/graph', methods=['GET'])
+def get_graph():
+    """Creates a new graph or updates an existing one with a new node"""
+    return jsonify(graph_data=app.graph.source)

@@ -2,11 +2,16 @@
 
 // Viz/graphviz utils
 
-/* Example for filling in graph data
-var result = Viz("digraph g { a -> b; }", options={ format:"svg", engine:"dot" });
-p = new DOMParser()
-var svg = p.parseFromString(result, "image/svg+xml");
+function update_flowchart() {
+    $.getJSON("/api/graph", function(data){
+        var fc_viz = Viz(data['graph_data'], options={ format:"svg", engine:"dot" });
+        var parser = new DOMParser();
+        var fc_svg = parser.parseFromString(fc_viz, "image/svg+xml");
+        var div_graph = $('#progress_graph')[0];
+        div_graph.appendChild(fc_svg.children[0]);
+    });
+}
 
-var div_graph = $('#progress_graph')[0]
-div_graph.appendChild(svg.children[0])
-*/
+$(document).ready(function(){
+    update_flowchart();
+});
