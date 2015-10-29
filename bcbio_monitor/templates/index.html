@@ -3,10 +3,24 @@
 {% block content %}
 
 <div id="welcome">
-  <h1>bcbio-nextgen analysis monitor</h1>
-  <p>Status of the current analsys</p>
+  <h1>{{ title }}</h1>
+  <div class="col-lg-6" id="progress_graph" class="graphviz-graph">
+      <!-- Source for the graph (or static image) will go here -->
+  </div>
+  <div class="col-lg-6">
+        <div class="bs-component">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Pipeline step</th>
+                <th>Started at</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="progress_table"></tbody>
+          </table>
+        </div>
+  </div>
 </div>
-<div id="progress_graph" class="graphviz-graph">
-    <!-- Source for the graph (or static image) will go here -->
-</div>
+
 {% endblock %}
