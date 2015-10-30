@@ -1,3 +1,5 @@
 flask >= 0.10.1
 requests
 graphviz
+yaml
+gevent >= 1.0

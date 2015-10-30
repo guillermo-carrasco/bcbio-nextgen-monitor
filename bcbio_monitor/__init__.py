@@ -1,16 +1,45 @@
 import argparse
 import os
+import time
 
-from flask import Flask, render_template, send_from_directory, jsonify
+import gevent
+
+from flask import Flask, Response, request, render_template, send_from_directory, jsonify
+from gevent.wsgi import WSGIServer
+from gevent.queue import Queue
+
 from bcbio_monitor import graph, config
 from bcbio_monitor import parser as ps
 
 # App initialization
 app = Flask(__name__, static_url_path='/static')
+subscriptions = []
 
 ###############
 # controllers #
 ###############
+# SSE "protocol" is described here: http://mzl.la/UPFyxY
+class ServerSentEvent(object):
+
+    def __init__(self, data):
+        self.data = data
+        self.event = None
+        self.id = None
+        self.desc_map = {
+            self.data : "data",
+            self.event : "event",
+            self.id : "id"
+        }
+
+    def encode(self):
+        if not self.data:
+            return ""
+        lines = ["%s: %s" % (v, k)
+                 for k, v in self.desc_map.iteritems() if k]
+
+        return "%s\n\n" % "\n".join(lines)
+
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'ico/favicon.ico')
@@ -30,6 +59,31 @@ def page_not_found(e):
 @app.route("/")
 def index():
     return render_template('index.html', **app.config)
+
+
+@app.route("/publish", methods=['POST'])
+def publish():
+    for sub in subscriptions[:]:
+        sub.put(request.data)
+    gevent.spawn(notify)
+
+    return "OK"
+
+
+@app.route("/subscribe")
+def subscribe():
+    def gen():
+        q = Queue()
+        subscriptions.append(q)
+        try:
+            while True:
+                result = q.get()
+                ev = ServerSentEvent(str(result))
+                yield ev.encode()
+        except GeneratorExit: # Or maybe use flask signals
+            subscriptions.remove(q)
+
+    return Response(gen(), mimetype="text/event-stream")
 
 
 ###################
@@ -60,4 +114,6 @@ def main():
     app.config.update(logfile=args.logfile, title=args.title, **_config.get('flask', {}))
     app.custom_configs = _config
     app.graph = graph.BcbioFlowChart(args.logfile)
-    app.run()
+    host, port = app.config.get('SERVER_NAME').split(':')
+    server = WSGIServer((host, int(port)), app)
+    server.serve_forever()

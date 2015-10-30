@@ -1,7 +1,6 @@
 // Custom JS methods and utils for bcbio-nextgen-monitor
 
 // Viz/graphviz utils
-
 function update_flowchart() {
     $.getJSON("/api/graph", function(data){
         // Fill in graph data
@@ -47,6 +46,15 @@ function update_flowchart() {
     });
 }
 
+//SSE messages subscriptions
+var evtSrc = new EventSource("/subscribe");
+
+evtSrc.onmessage = function(e) {
+    console.log(e.data);
+};
+
+
+// On start...
 $(document).ready(function(){
     update_flowchart();
 });
