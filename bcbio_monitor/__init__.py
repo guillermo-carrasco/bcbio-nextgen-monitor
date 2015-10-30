@@ -112,9 +112,10 @@ def main():
     args = parser.parse_args()
     if not os.path.exists(args.logfile):
         raise RuntimeError('Provided log file {} does not exist or is not readable.'.format(args.logfile))
-    _config = config.parse_config(args.config)
-    app.config.update(logfile=args.logfile, title=args.title, **_config.get('flask', {}))
-    app.custom_configs = _config
+
+    custom_config = config.parse_config(args.config)
+    app.config.update(logfile=args.logfile, title=args.title, **custom_config.get('flask', {}))
+    app.custom_configs = custom_config
     app.graph = graph.BcbioFlowChart(args.logfile)
     host, port = app.config.get('SERVER_NAME').split(':')
     server = WSGIServer((host, int(port)), app)
