@@ -63,8 +63,10 @@ def index():
 
 @app.route("/publish", methods=['POST'])
 def publish():
-    for sub in subscriptions[:]:
-        sub.put(request.data)
+    data = request.data
+    def notify():
+        for sub in subscriptions[:]:
+            sub.put(data)
     gevent.spawn(notify)
 
     return "OK"
