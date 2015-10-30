@@ -53,4 +53,6 @@ def main():
 @app.route('/api/graph', methods=['GET'])
 def get_graph():
     """Creates a new graph or updates an existing one with a new node"""
-    return jsonify(graph_data=app.graph.source, table_data=app.graph.get_times())
+    # Table data needs to be an array of dicts to keep sorted when sent to JS
+    _table_data = [{s: st} for s, st in app.graph.get_times().items()]
+    return jsonify(graph_data=app.graph.source, table_data=_table_data)
