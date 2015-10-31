@@ -13,36 +13,36 @@ function update_flowchart() {
         div_graph.appendChild(fc_svg);
 
         // Fill in timing table data
-        var t = $("#progress_table")[0];
-        $("#progress_table tr").remove()
-            for (var elem in data['table_data']) {
-                $.each(data['table_data'][elem], function(step, status) {
-                    var tr = document.createElement('tr');
-                    // Step column
-                    var td = document.createElement('td')
-                    td.textContent = step.replace('_', ' ')
-                    tr.appendChild(td);
-                    // timestamp column
-                    var td = document.createElement('td')
-                    td.textContent = status['timestamp'];
-                    tr.appendChild(td);
-                    // Status column
-                    var td = document.createElement('td')
-                    var label = document.createElement('span');
-                    label.classList.add('label');
-                    if (status['status'] == 'finished') {
-                        label.textContent = 'finished';
-                        label.classList.add('label-success');
-                    }
-                    else {
-                        label.textContent = 'running';
-                        label.classList.add('label-default');
-                    }
-                    td.appendChild(label);
-                    tr.appendChild(td);
-                    t.appendChild(tr);
-                });
-            }
+        //var t = $("#progress_table")[0];
+        // $("#progress_table tr").remove()
+        // for (var elem in data['table_data']) {
+        //     $.each(data['table_data'][elem], function(step, status) {
+        //         var tr = document.createElement('tr');
+        //         // Step column
+        //         var td = document.createElement('td')
+        //         td.textContent = step.replace('_', ' ')
+        //         tr.appendChild(td);
+        //         // timestamp column
+        //         var td = document.createElement('td')
+        //         td.textContent = status['timestamp'];
+        //         tr.appendChild(td);
+        //         // Status column
+        //         var td = document.createElement('td')
+        //         var label = document.createElement('span');
+        //         label.classList.add('label');
+        //         if (status['status'] == 'finished') {
+        //             label.textContent = 'finished';
+        //             label.classList.add('label-success');
+        //         }
+        //         else {
+        //             label.textContent = 'running';
+        //             label.classList.add('label-default');
+        //         }
+        //         td.appendChild(label);
+        //         tr.appendChild(td);
+        //         t.appendChild(tr);
+        //     });
+        // }
     });
 }
 

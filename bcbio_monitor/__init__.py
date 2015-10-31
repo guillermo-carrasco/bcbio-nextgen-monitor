@@ -94,9 +94,7 @@ def subscribe():
 @app.route('/api/graph', methods=['GET'])
 def get_graph():
     """Creates a new graph or updates an existing one with a new node"""
-    # Table data needs to be an array of dicts to keep sorted when sent to JS
-    _table_data = [{s: st} for s, st in app.graph.get_times().items()]
-    return jsonify(graph_data=app.graph.source, table_data=_table_data)
+    return jsonify(graph_data=app.graph.source)
 
 
 ###################
@@ -116,7 +114,7 @@ def main():
     custom_config = config.parse_config(args.config)
     app.config.update(logfile=args.logfile, title=args.title, **custom_config.get('flask', {}))
     app.custom_configs = custom_config
-    app.graph = graph.BcbioFlowChart(args.logfile)
     host, port = app.config.get('SERVER_NAME').split(':')
+    app.graph = graph.BcbioFlowChart(args.logfile, host, port)
     server = WSGIServer((host, int(port)), app)
     server.serve_forever()
