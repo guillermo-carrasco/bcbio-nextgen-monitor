@@ -12,15 +12,17 @@ from bcbio_monitor import parser as ps
 class BcbioFlowChart(Digraph):
     """Representation for a graphviz bcbio-nextgen flowchart"""
 
-    def __init__(self, logfile, host='localhost', port='5000'):
+    def __init__(self, logfile, host='localhost', port='5000', update=True):
         """Initialices a BcbioFlowChart object.
 
         :param logfile: str - Path to the logfile where to extract information
         :param host: str - Host address where the monitor is running
         :param port: str - Port where the monitor is listening
+        :param update: boolean - Update frontend on every line read
         """
         super(BcbioFlowChart, self).__init__(comment='bcbio flow chart', format='png', encoding='UTF8')
         self.logfile = logfile
+        self.update = update
         self.base_url = "http://{}".format(':'.join([host, port]))
         self._nodes = []
         self._reading_thread = threading.Thread(target=self.follow_log)
@@ -50,8 +52,9 @@ class BcbioFlowChart(Digraph):
                     if n_nodes > 1:
                         self.edge(self._nodes[n_nodes - 2], self._nodes[n_nodes -1])
 
-                # In any case, update the flowchart frontend with the new line
-                self.update_frontend(parsed_line)
+                # Update frontend only if its a new step _or_ the update flag is set to true
+                if self.update or parsed_line['step']:
+                    self.update_frontend(parsed_line)
 
 
     def update_frontend(self, info):

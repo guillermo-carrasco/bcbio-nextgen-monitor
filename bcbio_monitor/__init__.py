@@ -107,6 +107,8 @@ def main():
         help="PAth to the configuration file, defaults to ~/.bcbio/monitor.yaml")
     parser.add_argument('--title', type=str, default='bcbio-nextgen analysis monitor', help=("Title (or name) for the analysis, "
                                                                                              "i.e NA12878 test"))
+    parser.add_argument('--no-update', action='store_const', const='no_update', help="Don't update frontend " \
+                                                                "with the last log line read (less requests)")
     args = parser.parse_args()
     if not os.path.exists(args.logfile):
         raise RuntimeError('Provided log file {} does not exist or is not readable.'.format(args.logfile))
@@ -115,6 +117,7 @@ def main():
     app.config.update(logfile=args.logfile, title=args.title, **custom_config.get('flask', {}))
     app.custom_configs = custom_config
     host, port = app.config.get('SERVER_NAME').split(':')
-    app.graph = graph.BcbioFlowChart(args.logfile, host, port)
+    update = False if args.no_update else True
+    app.graph = graph.BcbioFlowChart(args.logfile, host, port, update)
     server = WSGIServer((host, int(port)), app)
     server.serve_forever()
