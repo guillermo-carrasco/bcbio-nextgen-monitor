@@ -1,6 +1,7 @@
 import argparse
 import os
 import time
+import webbrowser
 
 import gevent
 
@@ -120,4 +121,5 @@ def main():
     update = False if args.no_update else True
     app.graph = graph.BcbioFlowChart(args.logfile, host, port, update)
     server = WSGIServer((host, int(port)), app)
+    webbrowser.open('http://{}'.format(app.config.get('SERVER_NAME')))
     server.serve_forever()

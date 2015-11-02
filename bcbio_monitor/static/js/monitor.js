@@ -10,48 +10,69 @@ function update_flowchart() {
         fc_svg.style.display = "block";
         fc_svg.style.margin = "auto";
         var div_graph = $('#progress_graph')[0];
+        $('#progress_graph svg').remove()
         div_graph.appendChild(fc_svg);
-
-        // Fill in timing table data
-        //var t = $("#progress_table")[0];
-        // $("#progress_table tr").remove()
-        // for (var elem in data['table_data']) {
-        //     $.each(data['table_data'][elem], function(step, status) {
-        //         var tr = document.createElement('tr');
-        //         // Step column
-        //         var td = document.createElement('td')
-        //         td.textContent = step.replace('_', ' ')
-        //         tr.appendChild(td);
-        //         // timestamp column
-        //         var td = document.createElement('td')
-        //         td.textContent = status['timestamp'];
-        //         tr.appendChild(td);
-        //         // Status column
-        //         var td = document.createElement('td')
-        //         var label = document.createElement('span');
-        //         label.classList.add('label');
-        //         if (status['status'] == 'finished') {
-        //             label.textContent = 'finished';
-        //             label.classList.add('label-success');
-        //         }
-        //         else {
-        //             label.textContent = 'running';
-        //             label.classList.add('label-default');
-        //         }
-        //         td.appendChild(label);
-        //         tr.appendChild(td);
-        //         t.appendChild(tr);
-        //     });
-        // }
     });
 }
 
 //SSE messages subscriptions
-var evtSrc = new EventSource("/subscribe");
+var source = new EventSource("/subscribe");
 
-evtSrc.onmessage = function(e) {
-    console.log(e.data);
-};
+source.addEventListener('message', function(e) {
+  var data = JSON.parse(e.data);
+  // Update flowchart and table if its a new step
+  if (data.hasOwnProperty('when')) {
+    update_flowchart();
+
+    var t = $("#progress_table")[0];
+    // Set last label as finished
+    var table_rows = $("#progress_table tr")
+    if (table_rows.length) {
+        var last_row = table_rows[table_rows.length - 1]
+        var label = last_row.getElementsByClassName('label')[0]
+        label.classList.remove('label-default')
+        label.classList.add('label-success')
+        label.textContent = 'finished';
+    }
+
+    var tr = document.createElement('tr');
+    // Step column
+    var td = document.createElement('td')
+    td.textContent = data['step'].replace('_', ' ')
+    tr.appendChild(td);
+    // timestamp column
+    var td = document.createElement('td')
+    td.textContent = data['when'];
+    tr.appendChild(td);
+    // Status column
+    var td = document.createElement('td')
+    var label = document.createElement('span');
+    label.classList.add('label');
+    if (data['step'] == 'finished') {
+        label.textContent = 'finished';
+        label.classList.add('label-success');
+    }
+    else {
+        label.textContent = 'running';
+        label.classList.add('label-default');
+    }
+    td.appendChild(label);
+    tr.appendChild(td);
+    t.appendChild(tr);
+  }
+  // Update log visualizer _if_ container exists (update was True on application load)
+}, false);
+
+source.addEventListener('open', function(e) {
+  console.log("Connection with bcbio-monitor server opened.")
+}, false);
+
+source.addEventListener('error', function(e) {
+  if (e.readyState == EventSource.CLOSED) {
+    console.log("Connection with bcbio-monitor server was closed.")
+  }
+}, false);
+
 
 
 // On start...

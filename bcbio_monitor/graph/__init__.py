@@ -1,4 +1,5 @@
 """Module to generate and work with process flowcharts"""
+import json
 import threading
 import time
 
@@ -33,6 +34,8 @@ class BcbioFlowChart(Digraph):
 
     def follow_log(self):
         """Reads a logfile continuously and updates internal graph if new step is found"""
+        # Server needs to be up and running before starting sending POST requests
+        time.sleep(5)
         with open(self.logfile, 'r') as f:
             analysis_finished = False
             while not analysis_finished:
@@ -62,4 +65,7 @@ class BcbioFlowChart(Digraph):
 
         :param info: dict - Information from a line in the log. i.e regular line, new step.
         """
-        requests.post(self.base_url + '/publish', data=info)
+        headers = {'Content-Type': 'text/event-stream'}
+        if info.get('when'):
+            info['when'] = info['when'].isoformat()
+        requests.post(self.base_url + '/publish', data=json.dumps(info), headers=headers)
