@@ -115,10 +115,10 @@ def main():
         raise RuntimeError('Provided log file {} does not exist or is not readable.'.format(args.logfile))
 
     custom_config = config.parse_config(args.config)
-    app.config.update(logfile=args.logfile, title=args.title, **custom_config.get('flask', {}))
+    update = False if args.no_update else True
+    app.config.update(logfile=args.logfile, title=args.title, update=update, **custom_config.get('flask', {}))
     app.custom_configs = custom_config
     host, port = app.config.get('SERVER_NAME').split(':')
-    update = False if args.no_update else True
     app.graph = graph.BcbioFlowChart(args.logfile, host, port, update)
     server = WSGIServer((host, int(port)), app)
     webbrowser.open('http://{}'.format(app.config.get('SERVER_NAME')))

@@ -60,7 +60,13 @@ source.addEventListener('message', function(e) {
     tr.appendChild(td);
     t.appendChild(tr);
   }
-  // Update log visualizer _if_ container exists (update was True on application load)
+  else {
+    var panel = $("#panel-message");
+    if (panel.length){
+        panel = $("#panel-message")[0];
+        panel.textContent = data['line'];
+    }
+  }
 }, false);
 
 source.addEventListener('open', function(e) {
