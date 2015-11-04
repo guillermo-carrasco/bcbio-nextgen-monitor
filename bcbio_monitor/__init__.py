@@ -119,6 +119,8 @@ def main():
     args = parser.parse_args()
 
     custom_config = config.parse_config(args.config)
+    if not custom_config.get('remote') and not os.path.exists(args.logfile):
+        raise RuntimeError("Provided logfile does not exist or its not readable")
     update = False if args.no_update else True
     app.config.update(logfile=args.logfile, title=args.title, update=update, **custom_config.get('flask', {}))
     app.custom_configs = custom_config

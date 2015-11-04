@@ -10,29 +10,6 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 
-def get_bcbio_timings(path):
-    """Fetch timing information from a bcbio log file."""
-    with open(path, 'r') as file_handle:
-        steps = OrderedDict()
-        for line in file_handle:
-            matches = re.search(r'^\[([^\]]+)\] ([^:]+: .*)', line)
-            if not matches:
-                continue
-
-            tstamp = matches.group(1)
-            msg = matches.group(2)
-
-            if not msg.find('Timing: ') >= 0:
-                continue
-
-            when = datetime.strptime(tstamp, '%Y-%m-%dT%H:%MZ').replace(
-                tzinfo=pytz.timezone('UTC'))
-            step = msg.split(":")[-1].strip()
-            steps[when] = step
-
-        return steps
-
-
 def parse_log_line(line):
     """Parses a log line and returns it with more information
 
@@ -41,6 +18,9 @@ def parse_log_line(line):
                    analysis is finished
     """
     matches = re.search(r'^\[([^\]]+)\] ([^:]+: .*)', line)
+    error = re.search(r'Traceback', line)
+    if error:
+        return {'line': line, 'step': 'error'}
     if not matches:
         return {'line': line, 'step': None}
 

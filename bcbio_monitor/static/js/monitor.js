@@ -71,10 +71,25 @@ source.addEventListener('message', function(e) {
   if (data.hasOwnProperty('when')) {
     update_flowchart();
     add_table_row(data);
-    if (panel.length){
-        panel = $("#panel-message")[0];
-        panel.textContent = data['line'];
-    }
+  }
+  if (data['step'] == 'error') {
+      // Set last label as error
+      var table_rows = $("#progress_table tr")
+      if (table_rows.length) {
+          var last_row = table_rows[table_rows.length - 1]
+          var label = last_row.getElementsByClassName('label')[0]
+          label.classList.remove('label-default')
+          label.classList.add('label-danger')
+          label.textContent = 'Error';
+      }
+  }
+  // Update log messages panel
+  if (panel.length){
+      panel = $("#panel-message")[0];
+      panel.textContent = data['line'];
+      if (data['step'] == 'error') {
+          $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
+      }
   }
 }, false);
 

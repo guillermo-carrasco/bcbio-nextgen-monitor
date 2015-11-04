@@ -62,10 +62,10 @@ class BcbioFlowChart(Digraph):
                 time.sleep(1)
                 continue
             parsed_line = ps.parse_log_line(line)
-            analysis_finished = (parsed_line['step'] == 'finished')
+            analysis_finished = (parsed_line['step'] == 'finished') or (parsed_line['step'] == 'error')
 
             # If this is a new step, update internal data
-            if parsed_line['step']:
+            if parsed_line['step'] and not parsed_line['step'] == 'error':
                 self._steps.append(parsed_line)
                 node_id = '_'.join(parsed_line['step'].lower().split())
                 self.node(node_id, parsed_line['step'])
