@@ -26,6 +26,7 @@ class BcbioFlowChart(Digraph):
         self.update = update
         self.base_url = "http://{}".format(':'.join([host, port]))
         self._nodes = []
+        self._steps = []
         self._reading_thread = threading.Thread(target=self.follow_log)
         # Daemonise the thread so that it's killed with Ctrl+C
         self._reading_thread.daemon = True
@@ -48,6 +49,7 @@ class BcbioFlowChart(Digraph):
 
                 # If this is a new step, update internal data
                 if parsed_line['step']:
+                    self._steps.append(parsed_line)
                     node_id = '_'.join(parsed_line['step'].lower().split())
                     self.node(node_id, parsed_line['step'])
                     self._nodes.append(node_id)
@@ -69,3 +71,8 @@ class BcbioFlowChart(Digraph):
         if info.get('when'):
             info['when'] = info['when'].isoformat()
         requests.post(self.base_url + '/publish', data=json.dumps(info), headers=headers)
+
+
+    def get_table_data(self):
+        """Return information about registered steps"""
+        return self._steps

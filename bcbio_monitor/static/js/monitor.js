@@ -15,15 +15,15 @@ function update_flowchart() {
     });
 }
 
-//SSE messages subscriptions
-var source = new EventSource("/subscribe");
+function update_table() {
+    $.getJSON("/api/progress_table", function(data){
+        for (step in data['table_data']) {
+            add_table_row(data['table_data'][step]);
+        }
+    });
+}
 
-source.addEventListener('message', function(e) {
-  var data = JSON.parse(e.data);
-  // Update flowchart and table if its a new step
-  if (data.hasOwnProperty('when')) {
-    update_flowchart();
-
+function add_table_row(data) {
     var t = $("#progress_table")[0];
     // Set last label as finished
     var table_rows = $("#progress_table tr")
@@ -59,6 +59,17 @@ source.addEventListener('message', function(e) {
     td.appendChild(label);
     tr.appendChild(td);
     t.appendChild(tr);
+}
+
+//SSE messages subscriptions
+var source = new EventSource("/subscribe");
+
+source.addEventListener('message', function(e) {
+  var data = JSON.parse(e.data);
+  // Update flowchart and table if its a new step
+  if (data.hasOwnProperty('when')) {
+    update_flowchart();
+    add_table_row(data);
   }
   else {
     var panel = $("#panel-message");
@@ -84,4 +95,5 @@ source.addEventListener('error', function(e) {
 // On start...
 $(document).ready(function(){
     update_flowchart();
+    update_table();
 });

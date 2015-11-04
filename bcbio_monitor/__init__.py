@@ -93,9 +93,15 @@ def subscribe():
 #       API       #
 ###################
 @app.route('/api/graph', methods=['GET'])
-def get_graph():
-    """Creates a new graph or updates an existing one with a new node"""
+def get_graph_data():
+    """Returns Graphviz definition to build a graph in JS"""
     return jsonify(graph_data=app.graph.source)
+
+
+@app.route('/api/progress_table', methods=['GET'])
+def get_table_data():
+    """Returns information about the registered steps"""
+    return jsonify(table_data=app.graph.get_table_data())
 
 
 ###################
