@@ -1,5 +1,6 @@
 flask >= 0.10.1
-requests
-graphviz
-pyyaml
 gevent >= 1.0
+graphviz
+paramiko
+pyyaml
+requests
