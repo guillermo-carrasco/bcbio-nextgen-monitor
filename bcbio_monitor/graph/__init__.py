@@ -39,9 +39,11 @@ class BcbioFlowChart(Digraph):
         time.sleep(5)
         with open(self.logfile, 'r') as f:
             analysis_finished = False
+            last_line_read = False
             while not analysis_finished:
                 line = f.readline()
                 if not line:
+                    last_line_read = True
                     time.sleep(1)
                     continue
                 parsed_line = ps.parse_log_line(line)
@@ -57,8 +59,9 @@ class BcbioFlowChart(Digraph):
                     if n_nodes > 1:
                         self.edge(self._nodes[n_nodes - 2], self._nodes[n_nodes -1])
 
-                # Update frontend only if its a new step _or_ the update flag is set to true
-                if self.update or parsed_line['step']:
+                # Update frontend only if its a new step _or_ the update flag is set to true and we are
+                # not loading the log for the first time
+                if (last_line_read and self.update) or parsed_line['step']:
                     self.update_frontend(parsed_line)
 
 

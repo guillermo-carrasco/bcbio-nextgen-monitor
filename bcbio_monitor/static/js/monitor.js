@@ -66,13 +66,11 @@ var source = new EventSource("/subscribe");
 
 source.addEventListener('message', function(e) {
   var data = JSON.parse(e.data);
+  var panel = $("#panel-message");
   // Update flowchart and table if its a new step
   if (data.hasOwnProperty('when')) {
     update_flowchart();
     add_table_row(data);
-  }
-  else {
-    var panel = $("#panel-message");
     if (panel.length){
         panel = $("#panel-message")[0];
         panel.textContent = data['line'];
