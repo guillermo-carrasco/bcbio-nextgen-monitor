@@ -1,5 +1,7 @@
 <p align="center">
-    ![Screenshot](artwork/logo-letters.png)
+  <a href="https://github.com/guillermo-carrasco/bcbio-nextgen-monitor">
+    <img width="512" height="175" src="artwork/logo-letters.png"/>
+  </a>
 </p>
 
 ![Screenshot](docs/images/monitor.png)
