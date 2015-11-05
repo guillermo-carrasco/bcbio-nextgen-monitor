@@ -1,4 +1,6 @@
-## Monitor the status of bcbio-nextgen analyses
+<p align="center">
+    ![Screenshot](artwork/logo-letters.png)
+</p>
 
 ![Screenshot](docs/images/monitor.png)
 
