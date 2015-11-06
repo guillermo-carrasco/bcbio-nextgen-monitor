@@ -15,3 +15,7 @@ pre.log-message {
     border: 1px solid #cccccc;
     border-radius: 4px;
 }
+
+.progress {
+    height: 20px;
+}

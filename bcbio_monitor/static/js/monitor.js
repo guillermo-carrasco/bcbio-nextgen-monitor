@@ -42,7 +42,8 @@ function add_table_row(data) {
     tr.appendChild(td);
     // timestamp column
     var td = document.createElement('td')
-    td.textContent = data['when'];
+    var when = moment(data['when']);
+    td.textContent = when.format('YYYY MMM Do, H:mm');
     tr.appendChild(td);
     // Status column
     var td = document.createElement('td')
@@ -103,6 +104,11 @@ source.addEventListener('error', function(e) {
   }
 }, false);
 
+
+// Tooltip for the progress bar
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});
 
 
 // On start...
