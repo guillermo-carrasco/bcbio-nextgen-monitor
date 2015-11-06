@@ -23,6 +23,26 @@ function update_table() {
     });
 }
 
+function update_progress_bar(){
+
+    var pr = $("#progress_bar")[0];
+    $.getJSON("/api/progress_table", function(data){
+        var steps = data['table_data'];
+        var now = moment();
+        var portion_bar = "<div class=\"progress-bar\" style=\"width: {percent}; background: {bg}\" \
+                          \"title=\"{title}\" data-toggle=\"tooltip\" data-placement=\"top\" id=\"{id}\"></div>";
+        if (steps.length == 1) {
+            pr.innerHTML = portion_bar.allReplace({'{percent}': '100%', '{title}': steps[0]['step'], '{id}': steps[0]['step'].replace(' ', '_'), '{bg}': COLORS[0]});
+        }
+        else if (steps.length > 1) {
+            for (var i = 0; i < steps.length; i++) {
+                pr.innerHTML += portion_bar.allReplace({'{percent}': '10%', '{title}': steps[i]['step'], '{id}': steps[i]['step'].replace(' ', '_'), '{bg}': COLORS[i%N_COLORS]});
+            }
+        }
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+}
+
 function add_table_row(data) {
     var t = $("#progress_table")[0];
     // Set last label as finished
@@ -68,10 +88,11 @@ var source = new EventSource("/subscribe");
 source.addEventListener('message', function(e) {
   var data = JSON.parse(e.data);
   var panel = $("#panel-message");
-  // Update flowchart and table if its a new step
+  // Update flowchart, table and progress bar if its a new step
   if (data.hasOwnProperty('when')) {
     update_flowchart();
     add_table_row(data);
+    update_progress_bar();
   }
   if (data['step'] == 'error') {
       // Set last label as error
@@ -105,11 +126,14 @@ source.addEventListener('error', function(e) {
 }, false);
 
 
-// Tooltip for the progress bar
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-});
-
+// Replace several strings on the same call
+String.prototype.allReplace = function(obj) {
+    var retStr = this;
+    for (var x in obj) {
+        retStr = retStr.replace(new RegExp(x, 'g'), obj[x]);
+    }
+    return retStr;
+};
 
 // On start...
 $(document).ready(function(){
@@ -142,4 +166,5 @@ $(document).ready(function(){
 
     update_flowchart();
     update_table();
+    update_progress_bar();
 });
