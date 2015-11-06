@@ -2,7 +2,6 @@
 import glob
 
 from setuptools import setup, find_packages
-from pip.req import parse_requirements
 
 try:
     with open("requirements.txt", "r") as f:
@@ -11,7 +10,8 @@ except IOError:
     install_requires = []
 
 setup(name='bcbio_monitor',
-      version='0.1',
+      # For versioning: http://semver.org/
+      version='0.1.1',
       description="bcbio-monitor is an extension of bcbio-nextgen to visualize its progress",
       author='Guillermo Carrasco',
       author_email='guille.ch.88@gmail.com',
