@@ -11,6 +11,7 @@ from gevent.queue import Queue
 
 from bcbio_monitor import graph, config
 from bcbio_monitor import parser as ps
+from bcbio_monitor import log
 
 # App initialization
 app = Flask(__name__, static_url_path='/static')
@@ -116,16 +117,33 @@ def main():
                                                                                              "i.e NA12878 test"))
     parser.add_argument('--no-update', action='store_const', const='no_update', help="Don't update frontend " \
                                                                 "with the last log line read (less requests)")
+    parser.add_argument('--no-browser', action='store_const', const='no_browser', help="Don't open a new browser tab")
     args = parser.parse_args()
 
     custom_config = config.parse_config(args.config)
+
+    # Initialize logging
+    level = custom_config.get('log', {}).get('level')
+    if level:
+        try:
+            log.set_level(level)
+        except TypeError:
+            raise RuntimeError(("The provided log level \"{}\" is not a valid option, please specify one "
+                                "of the following levels: INFO, WARN, ERROR or DEBUG".format(level)))
+
+    # If logfile is local, check that it exists
     if not custom_config.get('remote') and not os.path.exists(args.logfile):
         raise RuntimeError("Provided logfile does not exist or its not readable")
+
+    # Modify app config with values from config file
     update = False if args.no_update else True
     app.config.update(logfile=args.logfile, title=args.title, update=update, **custom_config.get('flask', {}))
     app.custom_configs = custom_config
+
+    # Start application server
     host, port = app.config.get('SERVER_NAME').split(':')
     app.graph = graph.BcbioFlowChart(args.logfile, host, port, update, custom_config.get('remote', None))
     server = WSGIServer((host, int(port)), app)
-    webbrowser.open('http://{}'.format(app.config.get('SERVER_NAME')))
+    if not args.no_browser:
+        webbrowser.open('http://{}'.format(app.config.get('SERVER_NAME')))
     server.serve_forever()

@@ -1,5 +1,6 @@
 """Module to generate and work with process flowcharts"""
 import json
+import logging
 import threading
 import time
 
@@ -10,6 +11,8 @@ from collections import OrderedDict
 from bcbio_monitor import parser as ps
 from graphviz import Digraph
 from paramiko import client
+
+logger = logging.getLogger(__name__)
 
 class BcbioFlowChart(Digraph):
     """Representation for a graphviz bcbio-nextgen flowchart"""
@@ -42,6 +45,7 @@ class BcbioFlowChart(Digraph):
         time.sleep(5)
         try:
             if self.remote:
+                logger.debug('Logfile in remote host!')
                 cl = client.SSHClient()
                 # Try to load system keys
                 cl.load_system_host_keys()
@@ -66,6 +70,7 @@ class BcbioFlowChart(Digraph):
 
             # If this is a new step, update internal data
             if parsed_line['step'] and not parsed_line['step'] == 'error':
+                logger.debug('New step \"{}\" detected'.format(parsed_line['step']))
                 self._steps.append(parsed_line)
                 node_id = '_'.join(parsed_line['step'].lower().split())
                 self.node(node_id, parsed_line['step'])

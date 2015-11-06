@@ -55,6 +55,15 @@ remote:
     password: <remote user password> # Optional
 ```
 
+You can also modify the logging level by adding the corresponding section in the same configuration file:
+
+```yaml
+log:
+    level: INFO # or WARN, ERROR, DEBUG
+```
+
+Logging level is `INFO` by default. 
+
 #### Example of usage
 
     cd tests
