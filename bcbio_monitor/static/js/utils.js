@@ -9,6 +9,7 @@ moment.locale('en', {
       sameElse : 'L'
   }
 });
+
 moment.locale('en', {
     longDateFormat : {
         LT: "H:mm ",
@@ -32,7 +33,6 @@ String.prototype.allReplace = function(obj) {
     }
     return retStr;
 };
-
 
 var COLORS = {
     0: '#1dd2af',
