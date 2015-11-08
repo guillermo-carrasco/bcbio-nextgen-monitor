@@ -28,7 +28,7 @@ function update_progress_bar(){
     var pr = $("#progress_bar")[0];
     $.getJSON("/api/progress_table", function(data){
         var steps = data['table_data'];
-        var portion_bar = "<div class=\"progress-bar\" style=\"width: {percent}; background: {bg}\" title=\"{title}\" data-toggle=\"tooltip\" data-placement=\"top\" id=\"{id}\"></div>";
+        var portion_bar = '<div class="progress-bar" style="width: {percent}; background: {bg}" title="{title}" data-toggle="tooltip" data-placement="top" id="{id}"></div>';
         if (steps.length == 1) {
             pr.innerHTML = portion_bar.allReplace({'{percent}': '100%', '{title}': steps[0]['step'], '{id}': steps[0]['step'].replace(' ', '_'), '{bg}': COLORS[0]});
         }
