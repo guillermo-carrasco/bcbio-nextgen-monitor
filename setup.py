@@ -11,7 +11,7 @@ except IOError:
 
 setup(name='bcbio_monitor',
       # For versioning: http://semver.org/
-      version='0.1.1',
+      version='0.1.2',
       description="bcbio-monitor is an extension of bcbio-nextgen to visualize its progress",
       author='Guillermo Carrasco',
       author_email='guille.ch.88@gmail.com',
