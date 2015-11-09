@@ -9,15 +9,41 @@
 ### What is this?
 [bcbio-nextgen][bcbio] is a python toolkit providing best-practice pipelines for fully automated high throughput sequencing analysis.
 
-Despite its greatness, it is sometimes hard to know in what point of the analysis you are, and
-to get a sense of the duration of every step on the analysis. Since analyses last for several hours, you really want to get that information, and as of now, the only way to get it is to ssh
-into the node where you started the analysis and grep through the logs.
+**bcbio-monitor** is an independent web application to track `bcbcio-nextgen` analyses.
 
-For these reasons I decided to build a simple frontend to display the current status of a running (or finished) analysis. This is bcbio-nextgen-monitor.
-
-Going to the point, you only tell bcbio-monitor where [bcbio-nextgen-debug.log][bcbio-logging] is (either in your local machine or on a remote server), and it'll do the work.
+Going to the point, you only tell `bcbio-monitor` where [bcbio-nextgen-debug.log][bcbio-logging] is (either in your local machine or on a remote server), and it'll do the work.
 
 **For a technical overview of bcbio-monitor**, please read [this][tech-post] blog post.
+
+### Features
+
+#### Steps flowchart and table
+For a quick overview of the analysis status, just look at the flowchart or the information table.
+
+![flowchart-table](docs/images/flowchart-table.png)
+
+_NOTE: On future versions, the flowchart will be more useful, showing information about the nodes
+in which the steps were ran._
+
+#### Time used per step
+
+![progress](docs/images/progress-bar.png)
+
+This bar will show you the percentage of time used for every step. Hover over the portions
+to see the percentage.
+
+#### Analysis feedback
+Since there can be several hours between steps, to add some feedback, I added a panel to show
+the last message read.
+
+![panel](docs/images/log-message.png)
+
+#### Final summary
+When the analysis is finished, an option will appear to show a global summary.
+
+![summary](docs/images/summary.png)
+
+As of by now, it is very basic. Will show more information in future versions. 
 
 ### Installation
 
@@ -62,7 +88,7 @@ log:
     level: INFO # or WARN, ERROR, DEBUG
 ```
 
-Logging level is `INFO` by default. 
+Logging level is `INFO` by default.
 
 #### Example of usage
 
