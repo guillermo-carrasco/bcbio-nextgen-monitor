@@ -7,6 +7,7 @@ import time
 import requests
 
 from bcbio_monitor import parser as ps
+from dateutil.parser import parse
 from graphviz import Digraph
 from paramiko import client
 
@@ -29,6 +30,7 @@ class BcbioFlowChart(Digraph):
         self.update = update
         self.remote = remote
         self.base_url = "http://{}".format(':'.join([host, port]))
+        self.analysis_finished = False
         self._nodes = []
         self._steps = []
         self._last_message = {'line': ''}
@@ -56,19 +58,19 @@ class BcbioFlowChart(Digraph):
                 f = open(self.logfile, 'r')
         except IOError:
             raise RuntimeError("Provided logfile does not exist or its not readable")
-        analysis_finished = False
+        self.analysis_finished = False
         last_line_read = False
-        while not analysis_finished:
+        while not self.analysis_finished:
             line = f.readline()
             if not line:
+                if not last_line_read and self.update:
+                    self.update_frontend(self._last_message)
                 last_line_read = True
-                if self.update:
-                    self.update_frontend(self.last_message)
                 time.sleep(1)
                 continue
             parsed_line = ps.parse_log_line(line)
             self._last_message = parsed_line
-            analysis_finished = (parsed_line['step'] == 'finished') or (parsed_line['step'] == 'error')
+            self.analysis_finished = (parsed_line['step'] == 'finished') or (parsed_line['step'] == 'error')
 
             # If this is a new step, update internal data
             if parsed_line['step'] and not parsed_line['step'] == 'error':
@@ -103,6 +105,21 @@ class BcbioFlowChart(Digraph):
         """Return information about registered steps"""
         return self._steps
 
+
     def get_last_message(self):
         """Returns last message read"""
         return self._last_message
+
+
+    def get_summary(self):
+        """Returns some summary data for a finished analysis"""
+        if not self.analysis_finished:
+            return []
+        summary = {'times_summary': []}
+        for i in range(len(self._steps) - 1):
+            step = self._steps[i]
+            begin = parse(step['when'])
+            end = parse(self._steps[i + 1]['when'])
+            duration = end - begin
+            summary['times_summary'].append((step['step'], duration.seconds))
+        return summary

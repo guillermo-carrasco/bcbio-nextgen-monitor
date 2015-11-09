@@ -110,6 +110,12 @@ def get_last_message():
     return jsonify(app.graph.get_last_message())
 
 
+@app.route('/api/summary', methods=['GET'])
+def summary():
+    """Get summary of a finished analysis"""
+    return jsonify(app.graph.get_summary())
+
+
 ###################
 #      Main       #
 ###################

@@ -90,10 +90,12 @@ function add_table_row(data) {
     var td = document.createElement('td')
     var label = document.createElement('span');
     label.classList.add('label');
+
     if (data['step'] == 'finished') {
         label.textContent = 'finished';
         label.classList.add('label-success');
         $("#summary-div").css('display', 'flex');
+        create_summary();
     }
     else {
         label.textContent = 'running';
@@ -102,6 +104,24 @@ function add_table_row(data) {
     td.appendChild(label);
     tr.appendChild(td);
     t.appendChild(tr);
+}
+
+
+function create_summary() {
+    $.getJSON('/api/summary', function(summary_data){
+        // Create table for times summary
+        var times_summary = summary_data['times_summary'];
+        var total_time = 0;
+        $.each(times_summary, function(intex, step){
+            total_time += step[1];
+            var tr = $('<tr></tr>')
+            tr.append($('<td></td>').text(step[0]));
+            tr.append($('<td></td>').text(moment.duration(step[1], 'seconds').humanize()));
+            $("#times-summary-table-body").append(tr);
+        });
+        //Total analysis time
+        $("#analysis-time").text(moment.duration(total_time, 'seconds').humanize());
+    });
 }
 
 //SSE messages subscriptions
