@@ -6,8 +6,6 @@ import time
 
 import requests
 
-from collections import OrderedDict
-
 from bcbio_monitor import parser as ps
 from graphviz import Digraph
 from paramiko import client

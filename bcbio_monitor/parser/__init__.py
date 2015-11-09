@@ -7,7 +7,6 @@ on the user machine.
 import pytz
 import re
 
-from collections import OrderedDict
 from datetime import datetime
 
 def parse_log_line(line):

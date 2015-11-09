@@ -41,7 +41,8 @@ function update_progress_bar(){
             var total_time = moment(steps[steps.length - 1]['when']).diff(moment(steps[0]['when']), 'seconds');
             pr.innerHTML = ''
             for (var i = 0; i < steps.length; i++) {
-                var percent = (times[i]/total_time) * 100;
+                var percent;
+                total_time == 0 ? percent = 100 : (times[i]/total_time) * 100;
                 pr.innerHTML += portion_bar.allReplace({'{percent}': percent + '%', '{title}': steps[i]['step'], '{pc}': parseFloat(percent).toFixed(2),
                                                         '{id}': steps[i]['step'].replace(' ', '_'), '{bg}': COLORS[i%N_COLORS]});
             }
