@@ -3,9 +3,8 @@
 {% block content %}
 
 <div id="welcome">
-    <h1>{{ title }}</h1>
-    <div class='btn-summary' id="summary-div" data-toggle="modal" data-target="#summary-modal">
-      <a class="btn btn-success btn-summary" id='summary-button'>Analysis finished. Click to see a summary.</a>
+    <div class='btn-summary' id="summary-div" data-target="#summary-modal">
+      <a class="btn btn-success btn-summary disabled" id='summary-button'>Analysis running, summary not available.</a>
     </div>
   <div class="progress-hint">
       (Percentage of time used by every step. Hover over the sections to see what step it corresponds to)

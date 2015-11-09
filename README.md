@@ -65,7 +65,7 @@ usage: bcbio_monitor [-h] [--config CONFIG] [--title TITLE] [--no-update]
                      [--no-browser] [--local]
                      logfile
 
-Plot bcbio-nextgen analysis status on a small webb application
+Show bcbio-nextgen analysis status on a web browser
 
 positional arguments:
   logfile          Path to the file bcbio-nextgen-debug.log

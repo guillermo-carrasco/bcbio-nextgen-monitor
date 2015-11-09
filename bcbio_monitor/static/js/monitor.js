@@ -94,7 +94,9 @@ function add_table_row(data) {
     if (data['step'] == 'finished') {
         label.textContent = 'finished';
         label.classList.add('label-success');
-        $("#summary-div").css('display', 'flex');
+        document.getElementById('summary-div').setAttribute('data-toggle', 'modal')
+        document.getElementById("summary-button").innerHTML = 'Analysis finished. Click to see a summary';
+        document.getElementById("summary-button").classList.remove('disabled');
         create_summary();
     }
     else {
