@@ -28,9 +28,10 @@ function update_progress_bar(){
     var pr = $("#progress_bar")[0];
     $.getJSON("/api/progress_table", function(data){
         var steps = data['table_data'];
-        var portion_bar = '<div class="progress-bar" style="width: {percent}; background: {bg}" title="{title}" data-toggle="tooltip" data-placement="top" id="{id}"></div>';
+        var portion_bar = '<div class="progress-bar" style="width: {percent}; background: {bg}" title="{title} ({pc}%)" data-toggle="tooltip" data-placement="top" id="{id}"></div>';
         if (steps.length == 1) {
-            pr.innerHTML = portion_bar.allReplace({'{percent}': '100%', '{title}': steps[0]['step'], '{id}': steps[0]['step'].replace(' ', '_'), '{bg}': COLORS[0]});
+            pr.innerHTML = portion_bar.allReplace({'{percent}': '100%', '{title}': steps[0]['step'], '{pc}': '100',
+                                                   '{id}': steps[0]['step'].replace(' ', '_'), '{bg}': COLORS[0]});
         }
         else if (steps.length > 1) {
             var times = new Array();
@@ -41,7 +42,8 @@ function update_progress_bar(){
             pr.innerHTML = ''
             for (var i = 0; i < steps.length; i++) {
                 var percent = (times[i]/total_time) * 100;
-                pr.innerHTML += portion_bar.allReplace({'{percent}': percent + '%', '{title}': steps[i]['step'], '{id}': steps[i]['step'].replace(' ', '_'), '{bg}': COLORS[i%N_COLORS]});
+                pr.innerHTML += portion_bar.allReplace({'{percent}': percent + '%', '{title}': steps[i]['step'], '{pc}': parseFloat(percent).toFixed(2),
+                                                        '{id}': steps[i]['step'].replace(' ', '_'), '{bg}': COLORS[i%N_COLORS]});
             }
         }
         $('[data-toggle="tooltip"]').tooltip();
