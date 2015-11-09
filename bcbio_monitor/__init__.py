@@ -118,6 +118,8 @@ def main():
     parser.add_argument('--no-update', action='store_const', const='no_update', help="Don't update frontend " \
                                                                 "with the last log line read (less requests)")
     parser.add_argument('--no-browser', action='store_const', const='no_browser', help="Don't open a new browser tab")
+    parser.add_argument('--local', action='store_const', const='local', help=("Force the monitor to look for the log file locally "
+                                                                              "(regardless of the configuration file.)"))
     args = parser.parse_args()
 
     custom_config = config.parse_config(args.config)
@@ -132,8 +134,13 @@ def main():
                                 "of the following levels: INFO, WARN, ERROR or DEBUG".format(level)))
 
     # If logfile is local, check that it exists
-    if not custom_config.get('remote') and not os.path.exists(args.logfile):
-        raise RuntimeError("Provided logfile does not exist or its not readable")
+    if not custom_config.get('remote') or args.local:
+        try:
+            del(custom_config['remote'])
+        except KeyError:
+            pass
+        if not os.path.exists(args.logfile):
+            raise RuntimeError("Provided logfile does not exist or its not readable")
 
     # Modify app config with values from config file
     update = False if args.no_update else True
