@@ -155,7 +155,7 @@ def main():
 
     # Modify app config with values from config file
     update = False if args.no_update else True
-    app.config.update(logfile=args.logfile, title=args.title, update=update, **custom_config.get('flask', {}))
+    app.config.update(logfile=args.logfile, title=args.title, update=update, **custom_config.get('server', {}))
     app.custom_configs = custom_config
 
     # Start application server
