@@ -93,6 +93,7 @@ function add_table_row(data) {
     if (data['step'] == 'finished') {
         label.textContent = 'finished';
         label.classList.add('label-success');
+        $("#summary-div").css('display', 'flex');
     }
     else {
         label.textContent = 'running';

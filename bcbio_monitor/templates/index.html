@@ -3,7 +3,10 @@
 {% block content %}
 
 <div id="welcome">
-  <h1>{{ title }}</h1>
+    <h1>{{ title }}</h1>
+    <div class='btn-summary' id="summary-div">
+      <a href="#" class="btn btn-success btn-summary" id='summary-button'>Analysis finished. Click to see a summary.</a>
+    </div>
   <div class="alert alert-info alert-dismissible" role="alert">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
