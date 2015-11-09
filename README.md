@@ -43,7 +43,7 @@ When the analysis is finished, an option will appear to show a global summary.
 
 ![summary](docs/images/summary.png)
 
-As of by now, it is very basic. Will show more information in future versions. 
+As of by now, it is very basic. Will show more information in future versions.
 
 ### Installation
 
@@ -57,7 +57,30 @@ Get the latest development version by cloning this repository and installing it:
 
 ### Usage
 
-Run `bcbio_monitor -h` to get information about usage. Please don't hesitate on [opening an issue][issue] if something is not clear.
+Run `bcbio_monitor -h` to get information about usage. Please don't hesitate to [open an issue][issue] if something is not clear.
+
+```
+$~> bcbio_monitor -h
+usage: bcbio_monitor [-h] [--config CONFIG] [--title TITLE] [--no-update]
+                     [--no-browser] [--local]
+                     logfile
+
+Plot bcbio-nextgen analysis status on a small webb application
+
+positional arguments:
+  logfile          Path to the file bcbio-nextgen-debug.log
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --config CONFIG  PAth to the configuration file, defaults to
+                   ~/.bcbio/monitor.yaml
+  --title TITLE    Title (or name) for the analysis, i.e NA12878 test
+  --no-update      Don't update frontend with the last log line read (less
+                   requests)
+  --no-browser     Don't open a new browser tab
+  --local          Force the monitor to look for the log file locally
+                   (regardless of the configuration file.)
+```
 
 #### Configuration
 bcbio-monitor expects a configuration file in [yaml][yaml] format to be located in `~/.bcbio/monitor.yaml`. There are two main sections that you may want to consider, those are

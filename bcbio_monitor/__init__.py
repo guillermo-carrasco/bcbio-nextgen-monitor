@@ -120,7 +120,7 @@ def summary():
 #      Main       #
 ###################
 def main():
-    parser = argparse.ArgumentParser(description='Plot bcbio-nextgen analysis status on a small webb application')
+    parser = argparse.ArgumentParser(description='Show bcbio-nextgen analysis status on a web browser')
     parser.add_argument('logfile', type=str, help="Path to the file bcbio-nextgen-debug.log")
     parser.add_argument('--config', type=str, default=os.path.join(os.environ.get('HOME'), '.bcbio/monitor.yaml'), \
         help="PAth to the configuration file, defaults to ~/.bcbio/monitor.yaml")
