@@ -31,6 +31,7 @@ class BcbioFlowChart(Digraph):
         self.base_url = "http://{}".format(':'.join([host, port]))
         self._nodes = []
         self._steps = []
+        self._last_message = {'line': ''}
         self._reading_thread = threading.Thread(target=self.follow_log)
         # Daemonise the thread so that it's killed with Ctrl+C
         self._reading_thread.daemon = True
@@ -61,9 +62,12 @@ class BcbioFlowChart(Digraph):
             line = f.readline()
             if not line:
                 last_line_read = True
+                if self.update:
+                    self.update_frontend(self.last_message)
                 time.sleep(1)
                 continue
             parsed_line = ps.parse_log_line(line)
+            self._last_message = parsed_line
             analysis_finished = (parsed_line['step'] == 'finished') or (parsed_line['step'] == 'error')
 
             # If this is a new step, update internal data
@@ -98,3 +102,7 @@ class BcbioFlowChart(Digraph):
     def get_table_data(self):
         """Return information about registered steps"""
         return self._steps
+
+    def get_last_message(self):
+        """Returns last message read"""
+        return self._last_message

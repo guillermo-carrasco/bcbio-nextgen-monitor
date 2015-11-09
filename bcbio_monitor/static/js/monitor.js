@@ -23,6 +23,19 @@ function update_table() {
     });
 }
 
+function update_log_message() {
+    $.getJSON("/api/last_message", function(message){
+        var panel = $("#panel-message");
+        if (panel.length){
+            panel = $("#panel-message")[0];
+            panel.textContent = message['line'];
+            if (message['step'] == 'error') {
+                $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
+            }
+        }
+    });
+}
+
 function update_progress_bar(){
 
     var pr = $("#progress_bar")[0];
@@ -42,7 +55,7 @@ function update_progress_bar(){
             pr.innerHTML = ''
             for (var i = 0; i < steps.length; i++) {
                 var percent;
-                total_time == 0 ? percent = 100 : (times[i]/total_time) * 100;
+                total_time == 0 ? percent = 100 : percent = (times[i]/total_time) * 100;
                 pr.innerHTML += portion_bar.allReplace({'{percent}': percent + '%', '{title}': steps[i]['step'], '{pc}': parseFloat(percent).toFixed(2),
                                                         '{id}': steps[i]['step'].replace(' ', '_'), '{bg}': COLORS[i%N_COLORS]});
             }
@@ -95,7 +108,6 @@ var source = new EventSource("/subscribe");
 
 source.addEventListener('message', function(e) {
   var data = JSON.parse(e.data);
-  var panel = $("#panel-message");
   // Update flowchart, table and progress bar if its a new step
   if (data.hasOwnProperty('when')) {
     update_flowchart();
@@ -114,13 +126,7 @@ source.addEventListener('message', function(e) {
       }
   }
   // Update log messages panel
-  if (panel.length){
-      panel = $("#panel-message")[0];
-      panel.textContent = data['line'];
-      if (data['step'] == 'error') {
-          $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
-      }
-  }
+  update_log_message();
 }, false);
 
 source.addEventListener('open', function(e) {
@@ -175,4 +181,5 @@ $(document).ready(function(){
     update_flowchart();
     update_table();
     update_progress_bar();
+    update_log_message();
 });

@@ -104,6 +104,12 @@ def get_table_data():
     return jsonify(table_data=app.graph.get_table_data())
 
 
+@app.route('/api/last_message', methods=['GET'])
+def get_last_message():
+    """Returns last message read by the monitor"""
+    return jsonify(app.graph.get_last_message())
+
+
 ###################
 #      Main       #
 ###################
