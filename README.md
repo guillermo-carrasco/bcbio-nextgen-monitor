@@ -56,45 +56,9 @@ log:
 Logging level is `INFO` by default.
 
 
-### Features
-
-#### Steps flowchart and table
-For a quick overview of the analysis status, just look at the flowchart or the information table.
-
-![flowchart-table](docs/images/flowchart-table.png)
-
-_NOTE: On future versions, the flowchart will be more useful, showing information about the nodes
-in which the steps were ran._
-
-#### Time used per step
-
-![progress](docs/images/progress-bar.png)
-
-This bar will show you the percentage of time used for every step. Hover over the portions
-to see the percentage.
-
-#### Analysis feedback
-Since there can be several hours between steps, to add some feedback, I added a panel to show
-the last message read.
-
-![panel](docs/images/log-message.png)
-
-#### Error detection
-You'll know if something went wrong during the analysis...
-
-![error](docs/images/error.png)
-
-#### Final summary
-When the analysis is finished, an option will appear to show a global summary.
-
-![summary](docs/images/summary.png)
-
-As of by now, it is very basic. Will show more information in future versions.
-
-
 [bcbio]: https://bcbio-nextgen.readthedocs.org/en/latest/
 [bcbio-logging]: https://bcbio-nextgen.readthedocs.org/en/latest/contents/testing.html#logging
-[tech-post]: http://mussol.org
+[tech-post]: http://mussol.org/2015/11/11/bcbio-monitor/
 [issue]: https://github.com/guillermo-carrasco/bcbio-nextgen-monitor/issues/new
 [yaml]: http://yaml.org/
 [flask_config]: http://flask.pocoo.org/docs/0.10/config/#builtin-configuration-values
