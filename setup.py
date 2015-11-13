@@ -21,6 +21,7 @@ setup(name='bcbio_monitor',
       entry_points={
         'console_scripts': [
             'bcbio_monitor = bcbio_monitor:main',
+            'bcbio-monitor = bcbio_monitor:main',
         ],
     },
       install_requires=install_requires
