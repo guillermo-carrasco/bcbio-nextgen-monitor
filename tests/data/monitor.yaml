@@ -1,0 +1,4 @@
+---
+flask:
+  SERVER_NAME: localhost:5000 # This is the address where bcbio_monitor will be served
+  DEBUG: true
