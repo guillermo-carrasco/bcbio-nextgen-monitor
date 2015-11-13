@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/guillermo-carrasco/bcbio-nextgen-monitor">
-    <img width="512" height="175" src="artwork/logo-letters.png"/>
+    <img width="370" height="200" src="artwork/logo-letters.png"/>
   </a>
 </p>
 
