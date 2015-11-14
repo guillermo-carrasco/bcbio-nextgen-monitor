@@ -9,7 +9,7 @@ except IOError:
 
 setup(name='bcbio_monitor',
       # For versioning: http://semver.org/
-      version='1.0.2',
+      version='1.0.3',
       description="bcbio-monitor is an extension of bcbio-nextgen to visualize its progress",
       author='Guillermo Carrasco',
       author_email='guille.ch.88@gmail.com',
@@ -20,8 +20,7 @@ setup(name='bcbio_monitor',
       zip_safe=True,
       entry_points={
         'console_scripts': [
-            'bcbio_monitor = bcbio_monitor:main',
-            'bcbio-monitor = bcbio_monitor:main',
+            'bcbio_monitor = bcbio_monitor.cli:cli',
         ],
     },
       install_requires=install_requires
