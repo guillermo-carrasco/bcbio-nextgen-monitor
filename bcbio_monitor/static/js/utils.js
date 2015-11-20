@@ -48,3 +48,9 @@ var COLORS = {
 }
 
 var N_COLORS = 10;
+
+// Actibate tabs
+$('#runs_holder a').click(function (e) {
+  e.preventDefault();
+  $(this).tab('show')
+})

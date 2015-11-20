@@ -4,6 +4,8 @@
   </a>
 </p>
 
+[![PyPI version](https://badge.fury.io/py/bcbio_monitor.svg)](https://badge.fury.io/py/bcbio_monitor)
+
 ![Screenshot](docs/images/monitor.png)
 
 ### What is this?

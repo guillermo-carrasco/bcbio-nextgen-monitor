@@ -175,32 +175,6 @@ String.prototype.allReplace = function(obj) {
 // On start...
 $(document).ready(function(){
 
-    // Format locale
-    moment.locale('en', {
-      calendar : {
-        lastDay : '[Yesterday at] LT',
-          sameDay : '[Today at] LT',
-          nextDay : '[Tomorrow at] LT',
-          lastWeek : '[last] dddd [at] LT',
-          nextWeek : 'dddd [at] LT',
-          sameElse : 'L'
-      }
-    });
-    moment.locale('en', {
-        longDateFormat : {
-            LT: "H:mm ",
-            LTS: "h:mm:ss A",
-            L: "YYYY MMM Do, H:mm",
-            l: "M/D/YYYY",
-            LL: "MMMM Do YYYY",
-            ll: "MMM D YYYY",
-            LLL: "MMMM Do YYYY LT",
-            lll: "MMM D YYYY LT",
-            LLLL: "dddd, MMMM Do YYYY LT",
-            llll: "ddd, MMM D YYYY LT"
-        }
-    });
-
     update_flowchart();
     update_table();
     update_progress_bar();
