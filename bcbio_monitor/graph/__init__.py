@@ -63,8 +63,10 @@ class BcbioFlowChart(Digraph):
         while not self.analysis_finished:
             line = f.readline()
             if not line:
-                if not last_line_read and self.update:
-                    self.update_frontend(self._last_message)
+                if not last_line_read:
+                    self.update_frontend({'finished_reading': True})
+                    if self.update:
+                        self.update_frontend(self._last_message)
                 last_line_read = True
                 time.sleep(1)
                 continue
