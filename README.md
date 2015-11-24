@@ -5,6 +5,7 @@
 </p>
 
 [![PyPI version](https://badge.fury.io/py/bcbio_monitor.svg)](https://badge.fury.io/py/bcbio_monitor)
+[![bioconda-badge](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io)
 
 ![Screenshot](docs/images/monitor.png)
 
@@ -19,7 +20,15 @@ Going to the point, you only tell `bcbio-monitor` where [bcbio-nextgen-debug.log
 
 ### Quick start
 
+With pip:
+
     pip install bcbio_monitor
+    wget https://raw.githubusercontent.com/guillermo-carrasco/bcbio-nextgen-monitor/master/tests/data/bcbio-nextgen-debug.log
+    bcbio_monitor bcbio-nextgen-debug.log --title "Test bcbio-monitor"
+
+With [conda][conda]:
+
+    conda install -c bioconda bcbio_monitor
     wget https://raw.githubusercontent.com/guillermo-carrasco/bcbio-nextgen-monitor/master/tests/data/bcbio-nextgen-debug.log
     bcbio_monitor bcbio-nextgen-debug.log --title "Test bcbio-monitor"
 
@@ -64,3 +73,4 @@ Logging level is `INFO` by default.
 [issue]: https://github.com/guillermo-carrasco/bcbio-nextgen-monitor/issues/new
 [yaml]: http://yaml.org/
 [flask_config]: http://flask.pocoo.org/docs/0.10/config/#builtin-configuration-values
+[conda]: http://docs.continuum.io/anaconda/index
