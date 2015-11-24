@@ -1,6 +1,7 @@
 // Custom JS methods and utils for bcbio-nextgen-monitor
 
 // Viz/graphviz utils
+
 function update_flowchart() {
   $.getJSON("/api/graph", function(data){
     // Fill in graph data
@@ -28,11 +29,26 @@ function update_log_message() {
     if (panel.length){
       $("#panel-message").text(message['line']);
       if (message['step'] == 'error') {
-        $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
+        error();
       }
     }
   });
 }
+
+// Set up all frontend elements to show that there has been an error
+function error() {
+  if ($("#progress_table tr").length) {
+    var label = $("#progress_table tr .label").last()[0];
+    label.classList.remove('label-default');
+    label.classList.add('label-danger');
+    label.textContent = 'Error';
+  }
+  $("#loading_modal").modal('hide');
+  $("#summary-button").text('Analysis failed. No summary available');
+  $("#panel-message").text("Error detected. Please go through the logs to determine the cause of the problem.");
+  $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
+}
+
 
 function update_progress_bar(){
 
@@ -141,17 +157,6 @@ source.addEventListener('message', function(e) {
       update_flowchart();
       add_table_row(data);
       update_progress_bar();
-    }
-    if (data['step'] == 'error') {
-      // Set last label as error
-      if ($("#progress_table tr").length) {
-        var label = $("#progress_table tr .label").last()[0];
-        label.classList.remove('label-default');
-        label.classList.add('label-danger');
-        label.textContent = 'Error';
-      }
-      $("#loading_modal").modal('hide');
-      $("#summary-button").text('Analysis failed. No summary available');
     }
     // Update log messages panel
     update_log_message();
