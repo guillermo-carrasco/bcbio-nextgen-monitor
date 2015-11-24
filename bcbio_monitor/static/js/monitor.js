@@ -9,9 +9,8 @@ function update_flowchart() {
     var fc_svg = parser.parseFromString(fc_viz, "image/svg+xml").children[0];
     fc_svg.style.display = "block";
     fc_svg.style.margin = "auto";
-    var div_graph = $('#progress_graph')[0];
     $('#progress_graph svg').remove()
-    div_graph.appendChild(fc_svg);
+    $('#progress_graph').append(fc_svg);
   });
 }
 
@@ -27,8 +26,7 @@ function update_log_message() {
   $.getJSON("/api/last_message", function(message){
     var panel = $("#panel-message");
     if (panel.length){
-      panel = $("#panel-message")[0];
-      panel.textContent = message['line'];
+      $("#panel-message").text(message['line']);
       if (message['step'] == 'error') {
         $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
       }
@@ -38,13 +36,14 @@ function update_log_message() {
 
 function update_progress_bar(){
 
-  var pr = $("#progress_bar")[0];
   $.getJSON("/api/progress_table", function(data){
     var steps = data['table_data'];
-    var portion_bar = '<div class="progress-bar" style="width: {percent}; background: {bg}" title="{title} ({pc}%)" data-toggle="tooltip" data-placement="top" id="{id}"></div>';
+    var portion_bar = '<div class="progress-bar" style="width: {percent}; background: {bg}" title="{title}' +
+                      ' ({pc}%)" data-toggle="tooltip" data-placement="top" id="{id}"></div>';
     if (steps.length == 1) {
-      pr.innerHTML = portion_bar.allReplace({'{percent}': '100%', '{title}': steps[0]['step'], '{pc}': '100',
-      '{id}': steps[0]['step'].replace(' ', '_'), '{bg}': COLORS[0]});
+      $("#progress_bar").append(portion_bar.allReplace({'{percent}': '100%', '{title}': steps[0]['step'],
+                                                        '{pc}': '100', '{id}': steps[0]['step'].replace(' ', '_'),
+                                                        '{bg}': COLORS[0]}));
     }
     else if (steps.length > 1) {
       var times = new Array();
@@ -52,12 +51,13 @@ function update_progress_bar(){
         times.push(moment(steps[i]['when']).diff(steps[i-1]['when'], 'seconds'));
       }
       var total_time = moment(steps[steps.length - 1]['when']).diff(moment(steps[0]['when']), 'seconds');
-      pr.innerHTML = ''
+      $("#progress_bar").empty();
       for (var i = 0; i < steps.length; i++) {
         var percent;
         total_time == 0 ? percent = 100 : percent = (times[i]/total_time) * 100;
-        pr.innerHTML += portion_bar.allReplace({'{percent}': percent + '%', '{title}': steps[i]['step'], '{pc}': parseFloat(percent).toFixed(2),
-        '{id}': steps[i]['step'].replace(' ', '_'), '{bg}': COLORS[i%N_COLORS]});
+        $("#progress_bar").append(portion_bar.allReplace({'{percent}': percent + '%', '{title}': steps[i]['step'],
+                                                          '{pc}': parseFloat(percent).toFixed(2), '{id}': steps[i]['step'].replace(' ', '_'),
+                                                          '{bg}': COLORS[i%N_COLORS]}));
       }
     }
     $('[data-toggle="tooltip"]').tooltip();
@@ -65,15 +65,12 @@ function update_progress_bar(){
 }
 
 function add_table_row(data) {
-  var t = $("#progress_table")[0];
   // Set last label as finished
-  var table_rows = $("#progress_table tr")
-  if (table_rows.length) {
-    var last_row = table_rows[table_rows.length - 1]
-    var label = last_row.getElementsByClassName('label')[0]
-    label.classList.remove('label-default')
-    label.classList.add('label-success')
-    label.textContent = 'finished';
+  if ($("#progress_table tr").length) {
+    var label = $("#progress_table tr .label").last()[0];
+    label.classList.remove('label-default');
+    label.classList.add('label-success');
+    label.textContent = 'finished';;
   }
 
   var tr = document.createElement('tr');
@@ -94,9 +91,11 @@ function add_table_row(data) {
   if (data['step'] == 'finished') {
     label.textContent = 'finished';
     label.classList.add('label-success');
-    document.getElementById('summary-div').setAttribute('data-toggle', 'modal')
-    document.getElementById("summary-button").innerHTML = 'Analysis finished. Click to see a summary';
-    document.getElementById("summary-button").classList.remove('disabled');
+    $('#summary-div').attr('data-toggle', 'modal');
+    $("#summary-button").text('Analysis finished. Click to see a summary');
+    $("#summary-button").removeClass('disabled');
+
+    // Create the summary and finally hide the loading modal
     create_summary();
     $("#loading_modal").modal('hide');
   }
@@ -106,7 +105,7 @@ function add_table_row(data) {
   }
   td.appendChild(label);
   tr.appendChild(td);
-  t.appendChild(tr);
+  $("#progress_table").append(tr);
 }
 
 
@@ -145,14 +144,14 @@ source.addEventListener('message', function(e) {
     }
     if (data['step'] == 'error') {
       // Set last label as error
-      var table_rows = $("#progress_table tr")
-      if (table_rows.length) {
-        var last_row = table_rows[table_rows.length - 1]
-        var label = last_row.getElementsByClassName('label')[0]
-        label.classList.remove('label-default')
-        label.classList.add('label-danger')
+      if ($("#progress_table tr").length) {
+        var label = $("#progress_table tr .label").last()[0];
+        label.classList.remove('label-default');
+        label.classList.add('label-danger');
         label.textContent = 'Error';
       }
+      $("#loading_modal").modal('hide');
+      $("#summary-button").text('Analysis failed. No summary available');
     }
     // Update log messages panel
     update_log_message();
