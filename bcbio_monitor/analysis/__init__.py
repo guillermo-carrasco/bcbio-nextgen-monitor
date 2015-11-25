@@ -13,8 +13,20 @@ from paramiko import client
 
 logger = logging.getLogger(__name__)
 
-class AnalysisData(Digraph):
-    """Representation for a graphviz bcbio-nextgen flowchart"""
+class RunData(Digraph):
+    """Container for the information of a particular run within an analsysis"""
+
+    def __init__(self, id):
+        # Initializes hte Digraph structure
+        super(RunData, self).__init__(comment='bcbio flow chart', format='png', encoding='UTF8')
+
+        self.ID = id
+        self._nodes = []
+        self.steps = []
+
+
+class AnalysisData(object):
+    """Representation for a bcbio-nextgen analysis log"""
 
     def __init__(self, logfile, host='localhost', port='5000', update=True, remote=None):
         """Initialices a AnalysisData object.
@@ -25,14 +37,13 @@ class AnalysisData(Digraph):
         :param update: boolean - Update frontend on every line read
         :param remote: dict - Connection parameters if the log is on a remote host.
         """
-        super(AnalysisData, self).__init__(comment='bcbio flow chart', format='png', encoding='UTF8')
         self.logfile = logfile
         self.update = update
         self.remote = remote
         self.base_url = "http://{}".format(':'.join([host, port]))
         self.analysis_finished = False
-        self._nodes = []
-        self._steps = []
+        self.runs = [RunData(1)]
+        self.current_run = 0
         self._last_message = {'line': ''}
         self._reading_thread = threading.Thread(target=self.follow_log)
         # Daemonise the thread so that it's killed with Ctrl+C
@@ -77,13 +88,13 @@ class AnalysisData(Digraph):
             # If this is a new step, update internal data
             if parsed_line['step'] and not parsed_line['step'] == 'error':
                 logger.debug('New step \"{}\" detected'.format(parsed_line['step']))
-                self._steps.append(parsed_line)
+                self.runs[self.current_run].steps.append(parsed_line)
                 node_id = '_'.join(parsed_line['step'].lower().split())
-                self.node(node_id, parsed_line['step'])
-                self._nodes.append(node_id)
-                n_nodes = len(self._nodes)
+                self.runs[self.current_run].node(node_id, parsed_line['step'])
+                self.runs[self.current_run]._nodes.append(node_id)
+                n_nodes = len(self.runs[self.current_run]._nodes)
                 if n_nodes > 1:
-                    self.edge(self._nodes[n_nodes - 2], self._nodes[n_nodes -1])
+                    self.runs[self.current_run].edge(self.runs[self.current_run]._nodes[n_nodes - 2], self.runs[self.current_run]._nodes[n_nodes -1])
 
             # Update frontend only if its a new step _or_ the update flag is set to true and we are
             # not loading the log for the first time
@@ -105,7 +116,7 @@ class AnalysisData(Digraph):
 
     def get_table_data(self):
         """Return information about registered steps"""
-        return self._steps
+        return self.runs[self.current_run].steps
 
 
     def get_last_message(self):
@@ -118,10 +129,10 @@ class AnalysisData(Digraph):
         if not self.analysis_finished:
             return []
         summary = {'times_summary': []}
-        for i in range(len(self._steps) - 1):
-            step = self._steps[i]
+        for i in range(len(self.runs[self.current_run].steps) - 1):
+            step = self.runs[self.current_run].steps[i]
             begin = parse(step['when'])
-            end = parse(self._steps[i + 1]['when'])
+            end = parse(self.runs[self.current_run].steps[i + 1]['when'])
             duration = end - begin
             summary['times_summary'].append((step['step'], duration.seconds))
         return summary
@@ -129,4 +140,4 @@ class AnalysisData(Digraph):
 
     @property
     def graph_source(self):
-        return self.source
+        return self.runs[self.current_run].source
