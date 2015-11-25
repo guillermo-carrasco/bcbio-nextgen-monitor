@@ -8,7 +8,7 @@ from flask import Flask
 from gevent.wsgi import WSGIServer
 
 
-from bcbio_monitor import graph, config, app
+from bcbio_monitor import analysis, config, app
 from bcbio_monitor import log
 
 def cli():
@@ -52,7 +52,7 @@ def cli():
 
     # Start application server
     host, port = app.config.get('SERVER_NAME').split(':')
-    app.graph = graph.BcbioFlowChart(args.logfile, host, port, update, custom_config.get('remote', None))
+    app.analysis = analysis.AnalysisData(args.logfile, host, port, update, custom_config.get('remote', None))
     server = WSGIServer((host, int(port)), app)
     if not args.no_browser:
         webbrowser.open('http://{}'.format(app.config.get('SERVER_NAME')))

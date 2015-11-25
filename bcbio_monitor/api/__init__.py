@@ -92,22 +92,22 @@ def index():
 @app.route('/api/graph', methods=['GET'])
 def get_graph_data():
     """Returns Graphviz definition to build a graph in JS"""
-    return jsonify(graph_data=app.graph.source)
+    return jsonify(graph_data=app.analysis.graph_source)
 
 
 @app.route('/api/progress_table', methods=['GET'])
 def get_table_data():
     """Returns information about the registered steps"""
-    return jsonify(table_data=app.graph.get_table_data())
+    return jsonify(table_data=app.analysis.get_table_data())
 
 
 @app.route('/api/last_message', methods=['GET'])
 def get_last_message():
     """Returns last message read by the monitor"""
-    return jsonify(app.graph.get_last_message())
+    return jsonify(app.analysis.get_last_message())
 
 
 @app.route('/api/summary', methods=['GET'])
 def summary():
     """Get summary of a finished analysis"""
-    return jsonify(app.graph.get_summary())
+    return jsonify(app.analysis.get_summary())

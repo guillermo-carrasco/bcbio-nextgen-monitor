@@ -13,11 +13,11 @@ from paramiko import client
 
 logger = logging.getLogger(__name__)
 
-class BcbioFlowChart(Digraph):
+class AnalysisData(Digraph):
     """Representation for a graphviz bcbio-nextgen flowchart"""
 
     def __init__(self, logfile, host='localhost', port='5000', update=True, remote=None):
-        """Initialices a BcbioFlowChart object.
+        """Initialices a AnalysisData object.
 
         :param logfile: str - Path to the logfile where to extract information
         :param host: str - Host address where the monitor is running
@@ -25,7 +25,7 @@ class BcbioFlowChart(Digraph):
         :param update: boolean - Update frontend on every line read
         :param remote: dict - Connection parameters if the log is on a remote host.
         """
-        super(BcbioFlowChart, self).__init__(comment='bcbio flow chart', format='png', encoding='UTF8')
+        super(AnalysisData, self).__init__(comment='bcbio flow chart', format='png', encoding='UTF8')
         self.logfile = logfile
         self.update = update
         self.remote = remote
@@ -125,3 +125,8 @@ class BcbioFlowChart(Digraph):
             duration = end - begin
             summary['times_summary'].append((step['step'], duration.seconds))
         return summary
+
+
+    @property
+    def graph_source(self):
+        return self.source
