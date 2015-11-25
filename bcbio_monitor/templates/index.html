@@ -26,25 +26,27 @@
     </div>
   </div>
   <!------------------------>
+
   <div class='btn-summary' id="summary-div" data-target="#summary-modal">
     <a class="btn btn-success btn-summary disabled" id='summary-button'>Analysis running, summary not available.</a>
   </div>
+
   <div class="progress-hint">
     (Percentage of time used by every step. Hover over the sections to see what step it corresponds to)
   </div>
-  <div class="progress" id='progress_bar'>
-  </div>
+
+  <div class="progress" id='progress_bar'></div>
+
   <div class="col-lg-6" id="progress_graph" class="graphviz-graph">
     <!-- Source for the graph (or static image) will go here -->
   </div>
+
   <div class="col-lg-6">
     <div class="bs-component">
-
       <ul class="nav nav-tabs" role="tablist" id="runs_holder">
         <li role="presentation" class="active"><a href="#run-1" aria-controls="run-1" role="tab" data-toggle="tab">Run #1</a></li>
         <!--<li role="presentation"><a href="#run-2" aria-controls="run-2" role="tab" data-toggle="tab">Run #2</a></li>-->
       </ul>
-
       <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="run-1">
           <table class="table table-striped table-hover">
@@ -57,27 +59,25 @@
             </thead>
             <tbody id="progress_table"></tbody>
           </table>
-
-          {% if update %}
-          <div class="bs-component">
-            <div class="panel panel-primary">
-              <div class="panel-heading">
-                <h3 class="panel-title">Last log message read</h3>
-              </div>
-              <div class="panel-body">
-                <pre class="log-message" id='panel-message'>
-                </pre>
-              </div>
-            </div>
-          </div>
-          {% endif %}
         </div>
-
         <!--<div role="tabpanel" class="tab-pane" id="run-2">This is just testing text </div>-->
       </div>
 
-
+      {% if update %}
+      <div class="bs-component">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">Last log message read</h3>
+          </div>
+          <div class="panel-body">
+            <pre class="log-message" id='panel-message'>
+            </pre>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
+
     <!-- SUMMARY MODAL -->
     <div class="modal" id="summary-modal">
       <div class="modal-dialog">
