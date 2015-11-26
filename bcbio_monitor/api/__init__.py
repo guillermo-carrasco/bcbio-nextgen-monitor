@@ -89,6 +89,11 @@ def index():
 ###################
 #       API       #
 ###################
+@app.route('/runs_info', methods=['GET'])
+def get_runs_info():
+    """Return all runs info in a single API call"""
+    return jsonify(data=app.analysis.get_runs_info())
+
 @app.route('/api/graph', methods=['GET'])
 def get_graph_data():
     """Returns Graphviz definition to build a graph in JS"""

@@ -25,6 +25,15 @@ class RunData(Digraph):
         self.steps = []
 
 
+    def json(self):
+        """Retrun JSON representation for this run"""
+        return {
+            "id": self.ID,
+            "steps": self.steps,
+            "graph_source": self.source
+        }
+
+
 class AnalysisData(object):
     """Representation for a bcbio-nextgen analysis log"""
 
@@ -141,3 +150,8 @@ class AnalysisData(object):
     @property
     def graph_source(self):
         return self.runs[self.current_run].source
+
+
+    def get_runs_info(self):
+        """Return all runs information serialized in JSON format"""
+        return map(lambda r: r.json(), self.runs)

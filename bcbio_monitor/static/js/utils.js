@@ -54,3 +54,13 @@ $('#runs_holder a').click(function (e) {
   e.preventDefault();
   $(this).tab('show')
 })
+
+
+//Compare two Run objects to sort an array of runs by id
+function compare(a, b) {
+  if (a.id < b.id)
+    return -1;
+  if (a.id > b.id)
+    return 1;
+  return 0;
+}
