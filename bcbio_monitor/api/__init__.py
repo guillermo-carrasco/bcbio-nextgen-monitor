@@ -94,25 +94,14 @@ def get_runs_info():
     """Return all runs info in a single API call"""
     return jsonify(data=app.analysis.get_runs_info())
 
-@app.route('/api/graph', methods=['GET'])
-def get_graph_data():
-    """Returns Graphviz definition to build a graph in JS"""
-    return jsonify(graph_data=app.analysis.graph_source)
 
-
-@app.route('/api/progress_table', methods=['GET'])
-def get_table_data():
-    """Returns information about the registered steps"""
-    return jsonify(table_data=app.analysis.get_table_data())
-
-
-@app.route('/api/last_message', methods=['GET'])
+@app.route('/last_message', methods=['GET'])
 def get_last_message():
     """Returns last message read by the monitor"""
     return jsonify(app.analysis.get_last_message())
 
 
-@app.route('/api/summary', methods=['GET'])
+@app.route('/summary', methods=['GET'])
 def summary():
     """Get summary of a finished analysis"""
     return jsonify(app.analysis.get_summary())
