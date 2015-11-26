@@ -15,7 +15,7 @@ function update_info() {
 
       // Update table
       $.each(run['steps'], function(s, step){
-        if (!$("#" + step['step'].replace(' ', '_')).length) {
+        if (!$("#" + step['step_id']).length) {
           add_table_row(step);
         }
       });
@@ -76,6 +76,12 @@ function error() {
   $("#summary-button").text('Analysis failed. No summary available');
   $("#panel-message").text("Error detected. Please go through the logs to determine the cause of the problem.");
   $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
+  $.each($(".label"), function(index, label){
+    if (label.innerHTML == "finished"){
+      label.classList.remove('label-danger');
+      label.classList.add('label-default');
+    }
+  });
 }
 
 
@@ -89,7 +95,7 @@ function add_table_row(data) {
   }
 
   var tr = document.createElement('tr');
-  tr.setAttribute('id', data['step'].replace(' ', '_'));
+  tr.setAttribute('id', data['step_id']);
   // Step column
   var td = document.createElement('td')
   td.textContent = data['step']

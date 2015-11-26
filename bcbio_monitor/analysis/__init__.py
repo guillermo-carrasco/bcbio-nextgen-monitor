@@ -97,8 +97,9 @@ class AnalysisData(object):
             # If this is a new step, update internal data
             if parsed_line['step'] and not parsed_line['step'] == 'error':
                 logger.debug('New step \"{}\" detected'.format(parsed_line['step']))
+                node_id = 'run-{}_'.format(self.current_run + 1) + '_'.join(parsed_line['step'].lower().split())
+                parsed_line['step_id'] = node_id
                 self.runs[self.current_run].steps.append(parsed_line)
-                node_id = '_'.join(parsed_line['step'].lower().split())
                 self.runs[self.current_run].node(node_id, parsed_line['step'])
                 self.runs[self.current_run]._nodes.append(node_id)
                 n_nodes = len(self.runs[self.current_run]._nodes)
