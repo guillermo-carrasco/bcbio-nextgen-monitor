@@ -74,14 +74,13 @@ function error() {
   }
   $("#loading_modal").modal('hide');
   $("#summary-button").text('Analysis failed. No summary available');
-  $("#panel-message").text("Error detected. Please go through the logs to determine the cause of the problem.");
-  $("#panel-message").css('background-color', 'rgba(231, 76, 60, 0.61)')
-  $.each($(".label"), function(index, label){
-    if (label.innerHTML == "finished"){
-      label.classList.remove('label-danger');
-      label.classList.add('label-default');
-    }
-  });
+  // Get current run (currently selected tab) and add an alert below
+  var current_run = $('#runs_holder li[class="active"]').attr('run');
+  if (!$("#alert-run-" + current_run).length) {
+    var error_text = "Error detected. Please go through the logs to determine the cause of the problem.";
+    $("#table-run-" + current_run).after('<div class="alert alert-danger" role="alert" id="alert-run-' +
+                                         current_run + '"> ' + error_text + '</div>');
+  }
 }
 
 
