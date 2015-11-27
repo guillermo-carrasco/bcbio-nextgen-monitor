@@ -160,8 +160,8 @@ function create_new_run() {
   $('#runs_holder li[class="active"]').removeClass('active');
   $('#runs_holder_content div[class="tab-pane active"]').removeClass('active');
   // Create new tab
-  var new_tab = '<li role="presentation" class="active" run="{cr}"><a href="#run-{cr}" aria-controls="content-run-{cr}" role="tab" data-toggle="tab">Run #{cr}</a></li>'.replace(/{cr}/g, CURRENT_RUN);
-  var new_tab_content = '<div role="tabpanel" class="tab-pane" id="content-run-{cr}"></div>'.replace(/{cr}/g, CURRENT_RUN);
+  var new_tab = '<li role="presentation" class="active" run="{cr}"><a href="#content-run-{cr}" aria-controls="content-run-{cr}" role="tab" data-toggle="tab">Run #{cr}</a></li>'.replace(/{cr}/g, CURRENT_RUN);
+  var new_tab_content = '<div role="tabpanel" class="tab-pane active" id="content-run-{cr}"></div>'.replace(/{cr}/g, CURRENT_RUN);
   $("#runs_holder").append(new_tab);
   $("#runs_holder_content").append(new_tab_content);
 
@@ -170,6 +170,7 @@ function create_new_run() {
   t2.attr('id', 'table-run-' + CURRENT_RUN);
   $("#content-run-" + CURRENT_RUN).append(t2);
   $("#table-run-2 tbody").empty();
+  activate_tabs();
 }
 
 //SSE messages subscriptions

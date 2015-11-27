@@ -50,10 +50,13 @@ var COLORS = {
 var N_COLORS = 10;
 
 // Actibate tabs
-$('#runs_holder a').click(function (e) {
-  e.preventDefault();
-  $(this).tab('show')
-})
+function activate_tabs() {
+  $('#runs_holder a').click(function (e) {
+    e.preventDefault();
+    $(this).tab('show')
+  });
+}
+activate_tabs();
 
 
 //Compare two Run objects to sort an array of runs by id
