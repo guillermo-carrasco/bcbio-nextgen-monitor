@@ -1,5 +1,11 @@
 // Custom JS methods and utils for bcbio-nextgen-monitor
 
+var CURRENT_RUN = "1";
+
+function increment_run() {
+  CURRENT_RUN = String(parseInt(CURRENT_RUN) + 1);
+}
+
 function update_info() {
   $.getJSON("/runs_info", function(runs){
     runs = runs['data'].sort(compare);
@@ -75,7 +81,7 @@ function error() {
   $("#loading_modal").modal('hide');
   $("#summary-button").text('Analysis failed. No summary available');
   // Get current run (currently selected tab) and add an alert below
-  var current_run = $('#runs_holder li[class="active"]').attr('run');
+  var current_run = CURRENT_RUN;
   if (!$("#alert-run-" + current_run).length) {
     var error_text = "Error detected. Please go through the logs to determine the cause of the problem.";
     $("#table-run-" + current_run).after('<div class="alert alert-danger" role="alert" id="alert-run-' +
@@ -145,6 +151,25 @@ function create_summary() {
     //Total analysis time
     $("#analysis-time").text(moment.duration(total_time, 'seconds').humanize());
   });
+}
+
+// Creates holders for a new run
+function create_new_run() {
+  increment_run();
+  // Set current tab as inactive
+  $('#runs_holder li[class="active"]').removeClass('active');
+  $('#runs_holder_content div[class="tab-pane active"]').removeClass('active');
+  // Create new tab
+  var new_tab = '<li role="presentation" class="active" run="{cr}"><a href="#run-{cr}" aria-controls="content-run-{cr}" role="tab" data-toggle="tab">Run #{cr}</a></li>'.replace(/{cr}/g, CURRENT_RUN);
+  var new_tab_content = '<div role="tabpanel" class="tab-pane" id="content-run-{cr}"></div>'.replace(/{cr}/g, CURRENT_RUN);
+  $("#runs_holder").append(new_tab);
+  $("#runs_holder_content").append(new_tab_content);
+
+  // Create new table for the tab, copying the one from run 1
+  var t2 = $("#table-run-1").clone();
+  t2.attr('id', 'table-run-' + CURRENT_RUN);
+  $("#content-run-" + CURRENT_RUN).append(t2);
+  $("#table-run-2 tbody").empty();
 }
 
 //SSE messages subscriptions
