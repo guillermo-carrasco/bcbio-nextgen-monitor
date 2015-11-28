@@ -92,7 +92,7 @@ class AnalysisData(object):
                 continue
             parsed_line = ps.parse_log_line(line)
             self._last_message = parsed_line
-            self.analysis_finished = (parsed_line['step'] == 'finished') or (parsed_line['step'] == 'error')
+            self.analysis_finished = parsed_line['step'] == 'finished'
 
             # If this is a new step, update internal data
             if parsed_line['step'] and not parsed_line['step'] == 'error':
