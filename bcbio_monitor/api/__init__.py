@@ -89,25 +89,36 @@ def index():
 ###################
 #       API       #
 ###################
-@app.route('/api/graph', methods=['GET'])
-def get_graph_data():
-    """Returns Graphviz definition to build a graph in JS"""
-    return jsonify(graph_data=app.analysis.graph_source)
+@app.route('/runs_info', methods=['GET'])
+def get_runs_info():
+    """Return all runs info in a single API call"""
+    return jsonify(data=app.analysis.get_runs_info())
 
 
-@app.route('/api/progress_table', methods=['GET'])
-def get_table_data():
-    """Returns information about the registered steps"""
-    return jsonify(table_data=app.analysis.get_table_data())
+@app.route('/graph_source', methods=['GET'])
+def graph_source_for_run():
+    run_id = request.args.get('run', 1)
+    return jsonify(graph_source=app.analysis.graph_source_for_run(int(run_id) - 1))
 
 
-@app.route('/api/last_message', methods=['GET'])
+@app.route('/steps', methods=['GET'])
+def table_data_for_run():
+    run_id = request.args.get('run', 0)
+    return jsonify(steps=app.analysis.table_data_for_run(int(run_id) - 1))
+
+
+@app.route('/status', methods=['GET'])
+def get_status():
+    return jsonify(app.analysis.get_status())
+
+
+@app.route('/last_message', methods=['GET'])
 def get_last_message():
     """Returns last message read by the monitor"""
     return jsonify(app.analysis.get_last_message())
 
 
-@app.route('/api/summary', methods=['GET'])
+@app.route('/summary', methods=['GET'])
 def summary():
     """Get summary of a finished analysis"""
     return jsonify(app.analysis.get_summary())

@@ -13,8 +13,29 @@ from paramiko import client
 
 logger = logging.getLogger(__name__)
 
-class AnalysisData(Digraph):
-    """Representation for a graphviz bcbio-nextgen flowchart"""
+class RunData(Digraph):
+    """Container for the information of a particular run within an analsysis"""
+
+    def __init__(self, id):
+        # Initializes hte Digraph structure
+        super(RunData, self).__init__(comment='bcbio flow chart', format='png', encoding='UTF8')
+
+        self.ID = id
+        self._nodes = []
+        self.steps = []
+
+
+    def json(self):
+        """Retrun JSON representation for this run"""
+        return {
+            "id": self.ID,
+            "steps": self.steps,
+            "graph_source": self.source
+        }
+
+
+class AnalysisData(object):
+    """Representation for a bcbio-nextgen analysis log"""
 
     def __init__(self, logfile, host='localhost', port='5000', update=True, remote=None):
         """Initialices a AnalysisData object.
@@ -25,19 +46,26 @@ class AnalysisData(Digraph):
         :param update: boolean - Update frontend on every line read
         :param remote: dict - Connection parameters if the log is on a remote host.
         """
-        super(AnalysisData, self).__init__(comment='bcbio flow chart', format='png', encoding='UTF8')
         self.logfile = logfile
         self.update = update
         self.remote = remote
         self.base_url = "http://{}".format(':'.join([host, port]))
+        self.FIRST_STEP = None
         self.analysis_finished = False
-        self._nodes = []
-        self._steps = []
+        self.finished_reading = False
+        self.runs = [RunData(1)]
+        self.current_run = 0
         self._last_message = {'line': ''}
         self._reading_thread = threading.Thread(target=self.follow_log)
         # Daemonise the thread so that it's killed with Ctrl+C
         self._reading_thread.daemon = True
         self._reading_thread.start()
+
+
+    def new_run(self):
+        """Creates a new RunData object and increments pointers"""
+        self.current_run += 1
+        self.runs.append(RunData(self.current_run + 1))
 
 
     def follow_log(self):
@@ -63,6 +91,7 @@ class AnalysisData(Digraph):
         while not self.analysis_finished:
             line = f.readline()
             if not line:
+                self.finished_reading = True
                 if not last_line_read:
                     self.update_frontend({'finished_reading': True})
                     if self.update:
@@ -72,18 +101,25 @@ class AnalysisData(Digraph):
                 continue
             parsed_line = ps.parse_log_line(line)
             self._last_message = parsed_line
-            self.analysis_finished = (parsed_line['step'] == 'finished') or (parsed_line['step'] == 'error')
+            self.analysis_finished = parsed_line['step'] == 'finished'
 
             # If this is a new step, update internal data
+            parsed_line['new_run'] = False
             if parsed_line['step'] and not parsed_line['step'] == 'error':
-                logger.debug('New step \"{}\" detected'.format(parsed_line['step']))
-                self._steps.append(parsed_line)
-                node_id = '_'.join(parsed_line['step'].lower().split())
-                self.node(node_id, parsed_line['step'])
-                self._nodes.append(node_id)
-                n_nodes = len(self._nodes)
+                if self.FIRST_STEP is None:
+                    self.FIRST_STEP = parsed_line['step']
+                elif parsed_line['step'] == self.FIRST_STEP:
+                    parsed_line['new_run'] = True
+                    self.new_run()
+                node_id = 'run-{}_'.format(self.current_run + 1) + '_'.join(parsed_line['step'].lower().split())
+                parsed_line['step_id'] = node_id
+                self.runs[self.current_run].steps.append(parsed_line)
+                self.runs[self.current_run].node(node_id, parsed_line['step'])
+                self.runs[self.current_run]._nodes.append(node_id)
+                n_nodes = len(self.runs[self.current_run]._nodes)
                 if n_nodes > 1:
-                    self.edge(self._nodes[n_nodes - 2], self._nodes[n_nodes -1])
+                    self.runs[self.current_run].edge(self.runs[self.current_run]._nodes[n_nodes - 2], self.runs[self.current_run]._nodes[n_nodes -1])
+                parsed_line['graph_source'] = self.runs[self.current_run].source
 
             # Update frontend only if its a new step _or_ the update flag is set to true and we are
             # not loading the log for the first time
@@ -105,7 +141,7 @@ class AnalysisData(Digraph):
 
     def get_table_data(self):
         """Return information about registered steps"""
-        return self._steps
+        return self.runs[self.current_run].steps
 
 
     def get_last_message(self):
@@ -118,10 +154,10 @@ class AnalysisData(Digraph):
         if not self.analysis_finished:
             return []
         summary = {'times_summary': []}
-        for i in range(len(self._steps) - 1):
-            step = self._steps[i]
+        for i in range(len(self.runs[self.current_run].steps) - 1):
+            step = self.runs[self.current_run].steps[i]
             begin = parse(step['when'])
-            end = parse(self._steps[i + 1]['when'])
+            end = parse(self.runs[self.current_run].steps[i + 1]['when'])
             duration = end - begin
             summary['times_summary'].append((step['step'], duration.seconds))
         return summary
@@ -129,4 +165,24 @@ class AnalysisData(Digraph):
 
     @property
     def graph_source(self):
-        return self.source
+        return self.runs[self.current_run].source
+
+
+    def graph_source_for_run(self, run_id):
+        if run_id >= len(self.runs):
+            return ""
+        return self.runs[run_id].source
+
+
+    def table_data_for_run(self, run_id):
+        if run_id >= len(self.runs):
+            return []
+        return self.runs[run_id].steps
+
+
+    def get_runs_info(self):
+        """Return all runs information serialized in JSON format"""
+        return map(lambda r: r.json(), self.runs)
+
+    def get_status(self):
+        return {'finished_reading': self.finished_reading}
