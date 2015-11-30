@@ -95,6 +95,18 @@ def get_runs_info():
     return jsonify(data=app.analysis.get_runs_info())
 
 
+@app.route('/graph_source', methods=['GET'])
+def graph_source_for_run():
+    run_id = request.args.get('run', 1)
+    return jsonify(graph_source=app.analysis.graph_source_for_run(int(run_id) - 1))
+
+
+@app.route('/steps', methods=['GET'])
+def table_data_for_run():
+    run_id = request.args.get('run', 0)
+    return jsonify(steps=app.analysis.table_data_for_run(int(run_id) - 1))
+
+
 @app.route('/last_message', methods=['GET'])
 def get_last_message():
     """Returns last message read by the monitor"""

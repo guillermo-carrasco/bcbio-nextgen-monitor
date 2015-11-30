@@ -50,6 +50,7 @@ class AnalysisData(object):
         self.update = update
         self.remote = remote
         self.base_url = "http://{}".format(':'.join([host, port]))
+        self.FIRST_STEP = None
         self.analysis_finished = False
         self.runs = [RunData(1)]
         self.current_run = 0
@@ -58,6 +59,12 @@ class AnalysisData(object):
         # Daemonise the thread so that it's killed with Ctrl+C
         self._reading_thread.daemon = True
         self._reading_thread.start()
+
+
+    def new_run(self):
+        """Creates a new RunData object and increments pointers"""
+        self.current_run += 1
+        self.runs.append(RunData(self.current_run + 1))
 
 
     def follow_log(self):
@@ -95,8 +102,13 @@ class AnalysisData(object):
             self.analysis_finished = parsed_line['step'] == 'finished'
 
             # If this is a new step, update internal data
+            parsed_line['new_run'] = False
             if parsed_line['step'] and not parsed_line['step'] == 'error':
-                logger.debug('New step \"{}\" detected'.format(parsed_line['step']))
+                if self.FIRST_STEP is None:
+                    self.FIRST_STEP = parsed_line['step']
+                elif parsed_line['step'] == self.FIRST_STEP:
+                    parsed_line['new_run'] = True
+                    self.new_run()
                 node_id = 'run-{}_'.format(self.current_run + 1) + '_'.join(parsed_line['step'].lower().split())
                 parsed_line['step_id'] = node_id
                 self.runs[self.current_run].steps.append(parsed_line)
@@ -105,6 +117,7 @@ class AnalysisData(object):
                 n_nodes = len(self.runs[self.current_run]._nodes)
                 if n_nodes > 1:
                     self.runs[self.current_run].edge(self.runs[self.current_run]._nodes[n_nodes - 2], self.runs[self.current_run]._nodes[n_nodes -1])
+                parsed_line['graph_source'] = self.runs[self.current_run].source
 
             # Update frontend only if its a new step _or_ the update flag is set to true and we are
             # not loading the log for the first time
@@ -151,6 +164,18 @@ class AnalysisData(object):
     @property
     def graph_source(self):
         return self.runs[self.current_run].source
+
+
+    def graph_source_for_run(self, run_id):
+        if run_id >= len(self.runs):
+            return ""
+        return self.runs[run_id].source
+
+
+    def table_data_for_run(self, run_id):
+        if run_id >= len(self.runs):
+            return []
+        return self.runs[run_id].steps
 
 
     def get_runs_info(self):
