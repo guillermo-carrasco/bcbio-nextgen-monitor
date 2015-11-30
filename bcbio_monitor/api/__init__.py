@@ -107,6 +107,11 @@ def table_data_for_run():
     return jsonify(steps=app.analysis.table_data_for_run(int(run_id) - 1))
 
 
+@app.route('/status', methods=['GET'])
+def get_status():
+    return jsonify(app.analysis.get_status())
+
+
 @app.route('/last_message', methods=['GET'])
 def get_last_message():
     """Returns last message read by the monitor"""

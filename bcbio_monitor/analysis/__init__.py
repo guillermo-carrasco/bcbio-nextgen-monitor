@@ -52,6 +52,7 @@ class AnalysisData(object):
         self.base_url = "http://{}".format(':'.join([host, port]))
         self.FIRST_STEP = None
         self.analysis_finished = False
+        self.finished_reading = False
         self.runs = [RunData(1)]
         self.current_run = 0
         self._last_message = {'line': ''}
@@ -90,6 +91,7 @@ class AnalysisData(object):
         while not self.analysis_finished:
             line = f.readline()
             if not line:
+                self.finished_reading = True
                 if not last_line_read:
                     self.update_frontend({'finished_reading': True})
                     if self.update:
@@ -181,3 +183,6 @@ class AnalysisData(object):
     def get_runs_info(self):
         """Return all runs information serialized in JSON format"""
         return map(lambda r: r.json(), self.runs)
+
+    def get_status(self):
+        return {'finished_reading': self.finished_reading}

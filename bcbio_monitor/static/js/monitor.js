@@ -66,7 +66,7 @@ function update_info(new_line) {
   if (typeof(new_line) == 'object') {
     update_flowchart(new_line['graph_source']);
     add_table_row(new_line);
-    update_progress_bar(new_line['steps']);
+    update_progress_bar_for_run(CURRENT_RUN);
   }
   else if (typeof(new_line) == 'undefined') {
     $.getJSON("/runs_info", function(runs){
@@ -89,7 +89,11 @@ function update_info(new_line) {
         update_log_message();
       });
     });
-    $("#loading_modal").modal('hide');
+    $.getJSON("/status", function(status) {
+      if (status['finished_reading']) {
+        $("#loading_modal").modal('hide');
+      }
+    });
   }
 }
 
