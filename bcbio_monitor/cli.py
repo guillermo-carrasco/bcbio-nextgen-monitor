@@ -36,6 +36,10 @@ def cli():
             raise RuntimeError(("The provided log level \"{}\" is not a valid option, please specify one "
                                 "of the following levels: INFO, WARN, ERROR or DEBUG".format(level)))
 
+    # Assume bcbio-nextgen-debug.log filename if logfile is a path
+    if not args.logfile.endswith("bcbio-nextgen-debug.log"):
+        args.logfile = os.path.join(args.logfile, 'bcbio-nextgen-debug.log')
+
     # If logfile is local, check that it exists
     if not custom_config.get('remote') or args.local:
         try:
