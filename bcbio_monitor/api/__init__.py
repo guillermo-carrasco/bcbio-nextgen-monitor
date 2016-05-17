@@ -109,7 +109,7 @@ def table_data_for_run():
 
 @app.route('/status', methods=['GET'])
 def get_status():
-    return jsonify(app.analysis.get_status())
+    return jsonify(app.analysis.get_status(run_id=request.args.get('run', None)))
 
 
 @app.route('/last_message', methods=['GET'])

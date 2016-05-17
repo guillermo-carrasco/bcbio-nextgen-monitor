@@ -23,6 +23,7 @@ class RunData(Digraph):
         self.ID = id
         self._nodes = []
         self.steps = []
+        self.errored = False
 
 
     def json(self):
@@ -30,7 +31,8 @@ class RunData(Digraph):
         return {
             "id": self.ID,
             "steps": self.steps,
-            "graph_source": self.source
+            "graph_source": self.source,
+            "errored": self.errored
         }
 
 
@@ -121,6 +123,9 @@ class AnalysisData(object):
                     self.runs[self.current_run].edge(self.runs[self.current_run]._nodes[n_nodes - 2], self.runs[self.current_run]._nodes[n_nodes -1])
                 parsed_line['graph_source'] = self.runs[self.current_run].source
 
+            elif parsed_line['step'] == 'error':
+                self.runs[self.current_run].errored = True
+
             # Update frontend only if its a new step _or_ the update flag is set to true and we are
             # not loading the log for the first time
             if (last_line_read and self.update) or parsed_line['step']:
@@ -184,5 +189,11 @@ class AnalysisData(object):
         """Return all runs information serialized in JSON format"""
         return map(lambda r: r.json(), self.runs)
 
-    def get_status(self):
+    def get_status(self, run_id=None):
+        if run_id is not None:
+            run_id = int(run_id)
+            if run_id >= len(self.runs):
+                return {}
+            return {'errored': self.runs[run_id].errored}
+
         return {'finished_reading': self.finished_reading}

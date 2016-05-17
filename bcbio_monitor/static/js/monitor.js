@@ -57,6 +57,16 @@ function update_progress_bar_for_run(run_id) {
   });
 }
 
+function update_summary_button_for_run(run_id) {
+  $.getJSON("/status?run=" + run_id, function(data){
+    var errored = data['errored'];
+    if(errored)
+      $("#summary-button").text('Analysis failed. No summary available');
+    else
+      $("#summary-button").text('Analysis running, summary not available.');
+  });
+}
+
 
 /*
  * If the method is called without parameters, it will update everything, otherwise it will only
@@ -213,6 +223,8 @@ function create_new_run() {
   $("#table-run-" + CURRENT_RUN + " tbody").empty();
   $("#table-run-" + CURRENT_RUN + " tbody").attr('id', 'progress-table-run-' + CURRENT_RUN);
   setup_tabs();
+
+  $("#summary-button").text('Analysis running, summary not available.');
 }
 
 //SSE messages subscriptions
@@ -248,15 +260,6 @@ source.addEventListener('error', function(e) {
 }, false);
 
 
-// Replace several strings on the same call
-String.prototype.allReplace = function(obj) {
-  var retStr = this;
-  for (var x in obj) {
-    retStr = retStr.replace(new RegExp(x, 'g'), obj[x]);
-  }
-  return retStr;
-};
-
 // Actibate tabs
 function setup_tabs() {
   $('#runs_holder a').click(function (e) {
@@ -268,6 +271,7 @@ function setup_tabs() {
     var run = e.currentTarget.getAttribute('run');
     update_flowchart_for_run(run);
     update_progress_bar_for_run(run);
+    update_summary_button_for_run(run);
   });
 }
 
