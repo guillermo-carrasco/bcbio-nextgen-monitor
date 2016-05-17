@@ -1,6 +1,7 @@
 """Module to generate and work with process flowcharts"""
 import json
 import logging
+import os
 import threading
 import time
 
@@ -10,6 +11,7 @@ from bcbio_monitor import parser as ps
 from dateutil.parser import parse
 from graphviz import Digraph
 from paramiko import client
+from socket import timeout, error
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +86,7 @@ class AnalysisData(object):
                            password=self.remote.get('password', None))
                 sftp = cl.open_sftp()
                 f = sftp.open(self.logfile, 'r')
+                f.settimeout(5) # Set 5 seconds timeout for read operations
             else:
                 f = open(self.logfile, 'r')
         except IOError:
@@ -91,45 +94,61 @@ class AnalysisData(object):
         self.analysis_finished = False
         last_line_read = False
         while not self.analysis_finished:
-            line = f.readline()
-            if not line:
-                self.finished_reading = True
-                if not last_line_read:
-                    self.update_frontend({'finished_reading': True})
-                    if self.update:
-                        self.update_frontend(self._last_message)
-                last_line_read = True
-                time.sleep(1)
-                continue
-            parsed_line = ps.parse_log_line(line)
-            self._last_message = parsed_line
-            self.analysis_finished = parsed_line['step'] == 'finished'
+            try:
+                line = f.readline()
+            except timeout:
+                logger.error("Connection with the server lost, trying to reconnect and continue reading")
+                current_pos = f.tell()
+                try:
+                    cl.connect(self.remote['host'], port=self.remote.get('port', 22), username=self.remote.get('username', None), \
+                               password=self.remote.get('password', None), timeout=300, banner_timeout=300)
+                except error:
+                    logger.error("Couldn't connect to the server after 5 minutes, aborting.")
+                    os._exit(0)
+                else:
+                    logger.info("Connection restablished!! Will continue reading the logfile")
+                sftp = cl.open_sftp()
+                f = sftp.open(self.logfile, 'r')
+                f.seek(current_pos)
+            else:
+                if not line:
+                    self.finished_reading = True
+                    if not last_line_read:
+                        self.update_frontend({'finished_reading': True})
+                        if self.update:
+                            self.update_frontend(self._last_message)
+                    last_line_read = True
+                    time.sleep(1)
+                    continue
+                parsed_line = ps.parse_log_line(line)
+                self._last_message = parsed_line
+                self.analysis_finished = parsed_line['step'] == 'finished'
 
-            # If this is a new step, update internal data
-            parsed_line['new_run'] = False
-            if parsed_line['step'] and not parsed_line['step'] == 'error':
-                if self.FIRST_STEP is None:
-                    self.FIRST_STEP = parsed_line['step']
-                elif parsed_line['step'] == self.FIRST_STEP:
-                    parsed_line['new_run'] = True
-                    self.new_run()
-                node_id = 'run-{}_'.format(self.current_run + 1) + '_'.join(parsed_line['step'].lower().split())
-                parsed_line['step_id'] = node_id
-                self.runs[self.current_run].steps.append(parsed_line)
-                self.runs[self.current_run].node(node_id, parsed_line['step'])
-                self.runs[self.current_run]._nodes.append(node_id)
-                n_nodes = len(self.runs[self.current_run]._nodes)
-                if n_nodes > 1:
-                    self.runs[self.current_run].edge(self.runs[self.current_run]._nodes[n_nodes - 2], self.runs[self.current_run]._nodes[n_nodes -1])
-                parsed_line['graph_source'] = self.runs[self.current_run].source
+                # If this is a new step, update internal data
+                parsed_line['new_run'] = False
+                if parsed_line['step'] and not parsed_line['step'] == 'error':
+                    if self.FIRST_STEP is None:
+                        self.FIRST_STEP = parsed_line['step']
+                    elif parsed_line['step'] == self.FIRST_STEP:
+                        parsed_line['new_run'] = True
+                        self.new_run()
+                    node_id = 'run-{}_'.format(self.current_run + 1) + '_'.join(parsed_line['step'].lower().split())
+                    parsed_line['step_id'] = node_id
+                    self.runs[self.current_run].steps.append(parsed_line)
+                    self.runs[self.current_run].node(node_id, parsed_line['step'])
+                    self.runs[self.current_run]._nodes.append(node_id)
+                    n_nodes = len(self.runs[self.current_run]._nodes)
+                    if n_nodes > 1:
+                        self.runs[self.current_run].edge(self.runs[self.current_run]._nodes[n_nodes - 2], self.runs[self.current_run]._nodes[n_nodes -1])
+                    parsed_line['graph_source'] = self.runs[self.current_run].source
 
-            elif parsed_line['step'] == 'error':
-                self.runs[self.current_run].errored = True
+                elif parsed_line['step'] == 'error':
+                    self.runs[self.current_run].errored = True
 
-            # Update frontend only if its a new step _or_ the update flag is set to true and we are
-            # not loading the log for the first time
-            if (last_line_read and self.update) or parsed_line['step']:
-                self.update_frontend(parsed_line)
+                # Update frontend only if its a new step _or_ the update flag is set to true and we are
+                # not loading the log for the first time
+                if (last_line_read and self.update) or parsed_line['step']:
+                    self.update_frontend(parsed_line)
         f.close()
 
 
